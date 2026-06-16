@@ -167,30 +167,33 @@ Each block lists **What · How it's built · Where · Why**.
 - **Where:** `template/`
 - **Why:** the DS declares intent and gets a working, governed project — no IaC assembly.
 
-### Reusable workflow — the uniform pipeline
-- **What:** the single shared CI/CD pipeline all DS projects run.
-- **How it's built:** `.github/workflows/cdk-deploy.yml` (`workflow_call`). Jobs: **validate**
-  (ruff + `cdk synth` + cdk-nag, **no AWS login** — synth is offline), **diff** (sticky PR
-  comment), **deploy-dev → deploy-preprod → deploy-prod** (sequential), each bound to a GitHub
-  Environment holding that account's OIDC `AWS_DEPLOY_ROLE_ARN` and protection rules
-  (required reviewers on prod). No long-lived AWS keys. **Hardened (ADR 0010):** third-party
-  actions pinned to commit SHAs; the `diff` job is gated to same-repo PRs (no fork access to
-  the deploy role); the posted diff is account-id-redacted; the workflow declares the
-  `AWS_DEPLOY_ROLE_ARN` secret explicitly.
+### Reusable workflow — the uniform pipeline (ADR 0011)
+- **What:** the single shared CI/CD pipeline both the master and every consumer run.
+- **How it's built:** `.github/workflows/cdk-deploy.yml` (`workflow_call`), `if:`-gated by
+  event — **validate** (ruff + `cdk synth` + cdk-nag, **no AWS login**) always; then:
+  - **PR (same-repo)** → **preview**: deploy an ephemeral `pr-<n>-<slug>` stack to **dev**
+    (`STACK_PREFIX`), comment on the PR; **PR closed** → `cdk destroy` it.
+  - **push `main`** → **deploy-dev** (`<slug>`).
+  - **push tag `vX.Y.Z`** → **deploy-dev → deploy-preprod → deploy-prod**; preprod & prod are
+    reachable **only via a release tag**, prod with Required Reviewers.
+  - **Deploy auth is platform-owned (no DS input, no per-repo secret):** per-stage account ids
+    are GitHub **variables** (`PAVED_CDK_{DEV,PREPROD,PROD}_ACCOUNT_ID`); the OIDC role ARN is
+    derived by convention (`…:role/paved-cdk-github-deploy`); those vars also feed the registry
+    for synth. Actions are SHA-pinned and PR jobs fork-gated (ADR 0010).
 - **Where:** `.github/workflows/cdk-deploy.yml`
-- **Why:** "uniformity by reference" — every project's pipeline is identical and updated
-  centrally by bumping one `@tag`.
+- **Why:** "uniformity by reference" + a clean DS boundary — identical pipeline everywhere,
+  updated by bumping one `@tag`, and the DS never touches AWS wiring.
 
 ### Consumer thin caller + git-tag distribution
 - **What:** how a consumer repo wires into the pipeline and the library.
 - **How it's built:** the rendered `.github/workflows/deploy.yml` is a thin caller —
-  `uses: <platform_repo>/.github/workflows/cdk-deploy.yml@<tag>`, passing **only**
-  `AWS_DEPLOY_ROLE_ARN` (not `secrets: inherit`). The rendered `pyproject.toml` pins the
-  library via `[tool.uv.sources]` to the GitHub repo + tag + subdirectory (no CodeArtifact;
-  ADR 0006). `copier update` bumps both the workflow `@tag` and the library pin together.
-  (Copier consumes the template from the **repo root** `copier.yml` via git tag — see the
-  [workload runbook](workload-runbook.md).)
+  `uses: <platform_repo>/.github/workflows/cdk-deploy.yml@<tag>` with `on:` for PR (incl.
+  close), `push main` and `push tag v*`. It passes **only** `stack_name` — **no `secrets:`
+  block, no AWS config** (deploy auth comes from platform variables, ADR 0011). The rendered
+  `pyproject.toml` pins the library via `[tool.uv.sources]` to the GitHub repo + tag +
+  subdirectory (no CodeArtifact; ADR 0006). `copier update` bumps both the workflow `@tag` and
+  the library pin together (template consumed from the **repo-root** `copier.yml`).
 - **Where:** `template/project/.github/workflows/deploy.yml.jinja`,
   `template/project/pyproject.toml.jinja`
-- **Why:** consumers carry almost nothing of their own; behaviour comes from the pinned
-  platform version and moves forward in lockstep on `copier update`.
+- **Why:** consumers carry almost nothing of their own — no AWS, no secrets; behaviour comes
+  from the pinned platform version and moves forward in lockstep on `copier update`.

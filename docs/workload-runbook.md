@@ -116,3 +116,29 @@ your own files (`src/…`, your `app.py` resource list) are merged, not overwrit
 > 90% of updates are just a library bump (steps `uv lock --upgrade` + `uv sync`) with **no
 > file edits** in your repo — because the infra logic lives in versioned library classes,
 > not in your scaffold.
+
+## 6. First-time setup against a fresh, empty GitHub repo
+You scaffold *into* the empty repo and push — and you set **nothing AWS-specific**:
+```bash
+git clone git@github.com:OWNER/orders-scoring.git && cd orders-scoring
+uvx copier copy --vcs-ref v0.2.0 gh:michaelfecher/paved-cdk .   # scaffold into the clone
+# … add src/<handler>, wire app.py (steps 2) …
+make validate                                                   # offline, no Node, no AWS
+git add -A && git commit -m "init from paved-cdk" && git push
+```
+What you do **not** do: no deploy-role ARN, no OIDC, no environment/secret setup. That is the
+**platform's** job (ADR 0011): the platform team provisions, per stage, the OIDC deploy role
+and the GitHub **variables** `PAVED_CDK_{DEV,PREPROD,PROD}_ACCOUNT_ID` (repo- or org-level).
+Your thin `deploy.yml` caller carries no `secrets:` block.
+
+## 7. What the pipeline does (you just push)
+| You do | Pipeline result |
+|---|---|
+| Open/Update a **PR** | ephemeral preview stack `pr-<n>-<slug>` in **dev**, commented on the PR |
+| **Close/merge** the PR | that preview is destroyed |
+| Push to **main** | deploy `<slug>` to **dev** |
+| Push a **release tag** `vX.Y.Z` | promote `<slug>`: dev → preprod → prod (prod needs reviewers) |
+
+`preprod` and `prod` are reachable **only via a release tag** — never from a PR or a plain
+push. The stack prefix for previews is applied by the platform (`STACK_PREFIX`); your `app.py`
+stays unchanged. Same pipeline runs in the master repo and every consumer (ADR 0011).

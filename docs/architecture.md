@@ -270,48 +270,58 @@ flowchart LR
 
 ---
 
-## 5. Uniform pipeline — 3 stages = 3 AWS accounts
+## 5. Uniform pipeline — event-driven, 3 stages, platform-owned auth (ADR 0011)
 
-One central reusable workflow; every consumer repo calls it with a thin caller, pinned by
-`@tag` (ADR 0007). "Uniformity by reference."
+One reusable workflow; the master and every consumer call it with a thin caller pinned by
+`@tag` (ADR 0007). The event decides what happens; the Data Scientist sets **nothing
+AWS-specific**.
 
 ```mermaid
 flowchart TB
-  subgraph consumer["Consumer repo (per DS project)"]
-    THIN[".github/workflows/deploy.yml<br/>uses: …/cdk-deploy.yml@v0.1.0<br/>secrets: inherit"]
+  subgraph consumer["Consumer / master repo"]
+    THIN[".github/workflows/deploy.yml<br/>uses: …/cdk-deploy.yml@tag<br/>with: stack_name (NO secrets)"]
   end
 
   subgraph platform["Platform repo — central source of truth"]
     RW["cdk-deploy.yml (workflow_call)"]
-    REG[(AccountRegistry<br/>static in code · deterministic)]
+    REG[(AccountRegistry<br/>static in code)]
+    VARS[["GitHub variables (platform-set):<br/>PAVED_CDK_*_ACCOUNT_ID<br/>→ OIDC role by convention"]]
   end
 
   THIN -->|"@tag"| RW
-
   RW --> V["validate<br/>ruff · cdk synth · cdk-nag<br/>(no AWS login)"]
   V --> D{"Event?"}
-  D -- pull_request --> DIFF["diff → sticky PR comment"]
-  D -- push main --> DEV
 
-  subgraph stages["Sequential stages (GitHub Environments)"]
-    DEV["deploy → dev"] --> TEST["deploy → preprod"] --> PROD["deploy → prod<br/>(required reviewers)"]
+  D -- "PR (same-repo)" --> PV["preview → dev<br/>pr-N-stack (ephemeral)"]
+  D -- "PR closed" --> PD["destroy pr-N-stack"]
+  D -- "push main" --> DEV
+  D -- "push tag vX.Y.Z" --> DEV
+
+  subgraph stages["release promotion (tag only)"]
+    DEV["deploy → dev"] --> PRE["deploy → preprod"] --> PROD["deploy → prod<br/>(required reviewers)"]
   end
 
-  DEV -.OIDC.-> ADEV[(AWS dev account)]
-  TEST -.OIDC.-> ATEST[(AWS preprod account)]
-  PROD -.OIDC.-> APROD[(AWS prod account)]
-
-  REG -.baseline per account.-> ADEV & ATEST & APROD
+  PV -.OIDC.-> ADEV[(AWS dev)]
+  PD -.OIDC.-> ADEV
+  DEV -.OIDC.-> ADEV
+  PRE -.OIDC.-> APRE[(AWS preprod)]
+  PROD -.OIDC.-> APROD[(AWS prod)]
+  VARS -.role ARN + account id.-> DEV & PRE & PROD & PV
+  REG -.baseline per account.-> ADEV & APRE & APROD
 
   classDef prod fill:#fee,stroke:#c33
   class PROD,APROD prod
 ```
 
-**Mechanics:** each stage = a GitHub Environment holding that account's OIDC deploy role
-(`AWS_DEPLOY_ROLE_ARN`) + protection rules (e.g. required reviewers on prod). Same code,
-same pipeline, different baseline per account (from the registry, by account id) → same
-paved road, different environment. Pipeline updates = bump the `@tag` in the caller (via
-`copier update`).
+**Mechanics:**
+- **dev** gets every `main` push; **preprod & prod only a release tag** `vX.Y.Z` (prod with
+  Required Reviewers). A **PR** gets a live, ephemeral `pr-<n>-<slug>` preview in **dev**
+  (same-repo only), destroyed when the PR closes — the prefix comes from `STACK_PREFIX`, which
+  `PlatformStack` applies transparently.
+- **Deploy auth is platform-owned:** per-stage account ids are GitHub **variables**
+  (not secrets), the OIDC role ARN is derived by convention; the same ids feed the registry so
+  synth resolves the baseline. The thin caller passes **no secrets and no AWS config**.
+- Pipeline updates = bump the `@tag` in the caller (via `copier update`).
 
 ---
 

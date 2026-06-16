@@ -1,20 +1,23 @@
 name: deploy
 
+# This caller is intentionally tiny and carries NO AWS config. The platform owns
+# all deploy wiring (OIDC roles, account ids) via GitHub variables; a Data
+# Scientist sets nothing AWS-specific. `copier update` bumps the @{{ platform_version }}
+# ref so every project moves with the platform.
+#
+# Triggers (the reusable workflow decides what each one does):
+#   PR (incl. close) -> ephemeral preview in dev / teardown
+#   push main        -> deploy to dev
+#   push tag v*      -> release: dev -> preprod -> prod
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
+    types: [opened, synchronize, reopened, closed]
 
-# Every Data-Science project shares ONE pipeline definition, maintained centrally
-# in {{ platform_repo }}. This caller is intentionally tiny — `copier update`
-# bumps the @{{ platform_version }} ref so all projects move together.
 jobs:
   cdk:
     uses: {{ platform_repo }}/.github/workflows/cdk-deploy.yml@{{ platform_version }}
     with:
       stack_name: {{ project_slug }}
-    # Pass only the deploy-role ARN (not `secrets: inherit`, which would forward
-    # every repo secret to the reusable workflow). Set AWS_DEPLOY_ROLE_ARN per
-    # GitHub Environment (dev / preprod / prod).
-    secrets:
-      AWS_DEPLOY_ROLE_ARN: {% raw %}${{ secrets.AWS_DEPLOY_ROLE_ARN }}{% endraw %}

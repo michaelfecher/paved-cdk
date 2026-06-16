@@ -26,7 +26,9 @@ privilege escalation. These are decisions worth recording, not just patches.
   (ADR 0006); committing `uv.lock` + `uv sync --frozen` is the consumer-side reproducibility
   recommendation.
 - **Least-privilege secrets.** The caller passes only `AWS_DEPLOY_ROLE_ARN`, declared
-  explicitly in the reusable workflow's `workflow_call.secrets`.
+  explicitly in the reusable workflow's `workflow_call.secrets`. **(Superseded by ADR 0011:**
+  the multi-account model needs per-stage values, so deploy auth moved to platform-set GitHub
+  **variables** — there is no per-repo deploy secret anymore.)
 - **No GitHub-expression injection.** Values flow into `github-script` via `env:`, read as
   `process.env.*` — never interpolated into the script body.
 - **Escalation-proof permissions boundary.** The boundary denies creating/altering IAM
