@@ -1,0 +1,22 @@
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# CDK
+cdk.out/
+
+# Real AWS account ids are injected via env vars — never commit them.
+# (the committed template is `env.example`, without a leading dot)
+.env
+.env.*
+
+# Local tooling installed during development (uv binary + cache, scratch temp)
+.tools/
+.tmp/
+
+# NOTE: a consumer project's cdk.context.json is a lockfile and must be committed;
+# this repo (the platform) has none to track.

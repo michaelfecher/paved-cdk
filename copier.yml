@@ -1,0 +1,41 @@
+# Copier template entry point at the repo ROOT, so the template can be consumed
+# straight from the git repo by tag:
+#   copier copy --vcs-ref v0.1.0 gh:michaelfecher/paved-cdk <dest>
+#   copier update            # in the consumer repo, pulls the latest tag
+# `_subdirectory` points at the rendered files; the rest of the monorepo
+# (packages/, docs/) is ignored by Copier.
+_min_copier_version: "9.0.0"
+_subdirectory: template/project
+_answers_file: .copier-answers.yml
+_templates_suffix: .jinja
+
+project_name:
+  type: str
+  help: Human-readable project name (e.g. "Churn Prediction")
+
+project_slug:
+  type: str
+  help: Slug used for the CDK stack name and resources
+  default: "{{ project_name | lower | replace(' ', '-') | replace('_', '-') }}"
+
+owner_email:
+  type: str
+  help: Owning Data Scientist email (becomes the Owner tag)
+
+team:
+  type: str
+  help: Team name (becomes the Team tag)
+
+cost_center:
+  type: str
+  help: Cost center (CostCenter tag, used for chargeback)
+
+platform_repo:
+  type: str
+  help: GitHub org/repo of the platform (source of the library + reusable pipeline)
+  default: michaelfecher/paved-cdk
+
+platform_version:
+  type: str
+  help: Platform version (git tag) to pin the library and the reusable pipeline to
+  default: v0.1.0

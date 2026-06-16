@@ -1,0 +1,17 @@
+[project]
+name = "{{ project_slug }}"
+version = "0.1.0"
+description = "{{ project_name }} — a Paved CDK project"
+requires-python = ">=3.11"
+dependencies = [
+    "aws-cdk-lib>=2.150.0,<3.0.0",
+    "constructs>=10.0.0,<11.0.0",
+    "cdk-nag>=2.28.0,<3.0.0",
+    "paved-cdk",
+]
+
+# The platform library is consumed straight from its GitHub repo, pinned to a tag
+# (GitHub has no native PyPI registry; git installs are version-pinnable and need
+# no extra package registry). `copier update` bumps platform_version here.
+[tool.uv.sources]
+paved-cdk = { git = "https://github.com/{{ platform_repo }}.git", tag = "{{ platform_version }}", subdirectory = "packages/paved_cdk" }

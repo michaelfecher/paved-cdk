@@ -1,0 +1,20 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Every Data-Science project shares ONE pipeline definition, maintained centrally
+# in {{ platform_repo }}. This caller is intentionally tiny — `copier update`
+# bumps the @{{ platform_version }} ref so all projects move together.
+jobs:
+  cdk:
+    uses: {{ platform_repo }}/.github/workflows/cdk-deploy.yml@{{ platform_version }}
+    with:
+      stack_name: {{ project_slug }}
+    # Pass only the deploy-role ARN (not `secrets: inherit`, which would forward
+    # every repo secret to the reusable workflow). Set AWS_DEPLOY_ROLE_ARN per
+    # GitHub Environment (dev / preprod / prod).
+    secrets:
+      AWS_DEPLOY_ROLE_ARN: {% raw %}${{ secrets.AWS_DEPLOY_ROLE_ARN }}{% endraw %}

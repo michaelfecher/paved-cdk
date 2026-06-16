@@ -1,0 +1,36 @@
+# {{ project_name }}
+
+Generated from the Paved CDK template.
+
+## First time
+
+```bash
+uv sync          # pulls the platform library straight from GitHub (pinned tag)
+uv run cdk synth # builds the template — deterministic, no AWS login needed
+```
+
+The platform library is declared as a git dependency in `pyproject.toml` (no extra
+package registry needed). `uv sync` clones it at tag `{{ platform_version }}`.
+
+## Deployment — three stages, one pipeline
+
+Pushing to `main` runs the **central, shared pipeline** (maintained in
+`{{ platform_repo }}`): lint → synth + cdk-nag → deploy **dev → test → prod**.
+Every DS project runs the exact same pipeline; it updates when you `copier update`
+(which bumps the `@{{ platform_version }}` ref in `.github/workflows/deploy.yml`).
+
+One-time per repo: create GitHub Environments `dev`, `test`, `prod`, each with a
+secret `AWS_DEPLOY_ROLE_ARN` (the OIDC deploy role of that account) and, for
+`prod`, required reviewers. Your team's three accounts are provisioned for you.
+
+## Pulling platform updates
+
+```bash
+copier update     # re-renders against the latest template, bumps the platform tag
+```
+
+## What you do NOT configure
+
+VPC, subnets, KMS encryption, IAM permissions boundary, log retention and
+governance tags are resolved automatically from whichever of your three accounts
+the pipeline is deploying into. Just add platform constructs in `app.py`.

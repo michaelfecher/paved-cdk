@@ -1,0 +1,168 @@
+# Central, reusable CDK pipeline for ALL Data-Science projects.
+#
+# This is THE single source of truth for how a DS project is validated and
+# deployed. Consumer repos call it with a thin caller (see the Copier template),
+# so every project's pipeline "runs the same" and is updated centrally by bumping
+# the @tag the caller references — no per-repo pipeline drift.
+#
+# Three stages = three AWS accounts (dev -> preprod -> prod), each modelled as a
+# GitHub Environment holding that account's OIDC deploy-role ARN
+# (AWS_DEPLOY_ROLE_ARN) and protection rules (e.g. required reviewers on prod).
+# The per-account paved-road config is resolved deterministically from the static
+# AccountRegistry in code (ADR 0008) — no SSM/DynamoDB lookup at synth.
+#
+# Supply chain: third-party actions are pinned to a full commit SHA (mutable tags
+# can be moved by a compromised maintainer). Consumers should commit `uv.lock` and
+# may switch `uv sync` to `uv sync --frozen` for fully reproducible builds.
+name: cdk-deploy
+
+on:
+  workflow_call:
+    inputs:
+      stack_name:
+        required: true
+        type: string
+      aws_region:
+        required: false
+        type: string
+        default: eu-west-1
+    secrets:
+      AWS_DEPLOY_ROLE_ARN:
+        required: true
+
+permissions:
+  id-token: write # OIDC into the target account
+  contents: read
+
+jobs:
+  validate:
+    name: lint + synth + cdk-nag
+    runs-on: ubuntu-latest
+    # No AWS role needed: config is static in code (ADR 0008), so synth is
+    # deterministic and offline. Only diff/deploy assume an account role.
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - run: npm install -g aws-cdk
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+      - run: uv sync
+      - run: uv run ruff check .
+      - name: cdk synth (cdk-nag runs as an App Aspect; violations fail here)
+        run: uv run cdk synth
+
+  diff:
+    name: cdk diff → PR comment (dev)
+    needs: validate
+    # SECURITY: `cdk diff` runs `python app.py` — i.e. arbitrary PR code — after
+    # assuming the dev deploy role. Restrict to same-repo PRs (forks get neither
+    # secrets nor an OIDC token, but this makes the intent explicit and also blocks
+    # the case where fork PRs are mirrored to a branch). Prefer a READ-ONLY diff
+    # role here over the full deploy role, and require reviewers on the dev
+    # Environment for untrusted contributors.
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write # the calling repo's default token must allow PR writes
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - run: npm install -g aws-cdk
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+      - run: uv sync
+      - uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ inputs.aws_region }}
+      - name: cdk diff
+        run: uv run cdk diff 2>&1 | tee diff.txt || true
+      - name: Post diff as a sticky PR comment
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          # Pass via env (not `${{ }}` interpolation into the script body) to avoid
+          # script injection, and redact 12-digit AWS account ids from the plan.
+          STACK_NAME: ${{ inputs.stack_name }}
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- cdk-diff -->';
+            const raw = fs.readFileSync('diff.txt', 'utf8').slice(0, 60000);
+            // Redact AWS account ids so the public PR comment does not leak them.
+            const diff = raw.replace(/\b\d{12}\b/g, '<aws-account-id>');
+            const stack = process.env.STACK_NAME;
+            const body = `${marker}\n### cdk diff → dev (\`${stack}\`)\n<details><summary>show plan</summary>\n\n\`\`\`\n${diff}\n\`\`\`\n</details>`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const existing = comments.find(c => c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+  deploy-dev:
+    name: deploy → dev
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - run: npm install -g aws-cdk
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+      - run: uv sync
+      - uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ inputs.aws_region }}
+      - run: uv run cdk deploy --require-approval never
+
+  deploy-preprod:
+    name: deploy → preprod
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: preprod
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - run: npm install -g aws-cdk
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+      - run: uv sync
+      - uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ inputs.aws_region }}
+      - run: uv run cdk deploy --require-approval never
+
+  deploy-prod:
+    name: deploy → prod
+    needs: deploy-preprod
+    runs-on: ubuntu-latest
+    environment: prod # configure required reviewers on this GitHub Environment
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - run: npm install -g aws-cdk
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+      - run: uv sync
+      - uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ inputs.aws_region }}
+      - run: uv run cdk deploy --require-approval never

@@ -1,0 +1,26 @@
+"""{{ project_name }} — generated from the Paved CDK template.
+
+You only declare WHAT you want. The platform resolves VPC, subnets, KMS, the IAM
+permissions boundary, tags and governance automatically from the target account.
+Add more platform constructs below; do not add vpc/env/kms arguments.
+"""
+
+import aws_cdk as cdk
+
+from paved_cdk import PlatformStack, SecureDataApi
+
+app = cdk.App()
+
+stack = PlatformStack(
+    app,
+    "{{ project_slug }}",
+    tags={
+        "Owner": "{{ owner_email }}",
+        "Team": "{{ team }}",
+        "CostCenter": "{{ cost_center }}",
+    },
+)
+
+SecureDataApi(stack, "DataApi")
+
+app.synth()

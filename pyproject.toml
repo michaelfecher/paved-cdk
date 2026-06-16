@@ -1,0 +1,37 @@
+[project]
+name = "paved-cdk-workspace"
+version = "0.0.0"
+description = "Paved CDK — monorepo root (uv workspace)"
+requires-python = ">=3.11"
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.uv.sources]
+paved-cdk = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "paved-cdk",
+    "pytest>=8.0",
+    "ruff>=0.6",
+    "copier>=9.0",
+    "defusedxml>=0.7",  # hardened XML parsing in docs/diagrams/gen_hld.py
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# Local-only dirs (vendored uv, scratch, CDK output) — absent in a fresh CI checkout,
+# but excluded so `ruff check .` is clean locally too (this tree is not always git).
+extend-exclude = [".tools", ".tmp", "cdk.out"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# Diagrams-as-code: long drawio style/shape string literals are unavoidable.
+"docs/diagrams/gen_hld.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["packages/paved_cdk/tests"]

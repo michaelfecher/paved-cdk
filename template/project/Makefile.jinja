@@ -1,0 +1,39 @@
+# Targets marked [Node] use the AWS CDK CLI (a Node.js app). Everything else is
+# pure Python (uv). For the daily loop you only need Python + uv; let the CI
+# pipeline handle deploys, or install Node locally only if you want `make deploy`.
+.DEFAULT_GOAL := help
+.PHONY: help install validate synth diff deploy lint test update
+
+help:  ## Show this help
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
+
+install:  ## Install deps (pulls the platform library at the pinned tag) — no Node
+	uv sync
+
+validate: install  ## Offline synth via Python only — no Node, no AWS creds
+	# Synthesizes against the dev baseline (placeholder account id if env unset), runs
+	# cdk-nag aspects, writes cdk.out/. No CDK CLI (Node) and no AWS login needed.
+	CDK_DEFAULT_ACCOUNT=$${PAVED_CDK_DEV_ACCOUNT_ID:-111111111111} \
+	CDK_DEFAULT_REGION=$${PAVED_CDK_REGION:-eu-west-1} \
+	CDK_OUTDIR=cdk.out \
+	uv run python app.py
+	@echo "✓ synthesized to cdk.out/ (no Node, no AWS)"
+
+synth: install  ## [Node] Synthesize via the CDK CLI (cdk-nag runs here)
+	uv run cdk synth
+
+diff: install  ## [Node] Show changes vs the deployed dev stack
+	uv run cdk diff
+
+deploy: install  ## [Node] Deploy to DEV (preprod/prod go through the pipeline)
+	uv run cdk deploy --require-approval never
+
+lint: install  ## Lint — no Node
+	uv run ruff check .
+
+test: install  ## Run tests — no Node
+	uv run pytest -q
+
+update:  ## Pull the latest platform template + bump the pinned version — no Node
+	uvx copier update --trust

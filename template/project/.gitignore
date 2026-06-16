@@ -1,0 +1,8 @@
+.venv/
+cdk.out/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# NOTE: cdk.context.json is intentionally NOT ignored — it is a lockfile of the
+# resolved account configuration and must be committed.

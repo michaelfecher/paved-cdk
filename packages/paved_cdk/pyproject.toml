@@ -1,0 +1,25 @@
+[project]
+name = "paved-cdk"
+version = "0.1.0"
+description = "Paved CDK — paved-road AWS CDK construct library; secure, account-aware constructs for Data Scientists with no IaC background."
+requires-python = ">=3.11"
+authors = [{ name = "Paved CDK Team" }]
+readme = "README.md"
+dependencies = [
+    "aws-cdk-lib>=2.150.0,<3.0.0",
+    "constructs>=10.0.0,<11.0.0",
+    "cdk-nag>=2.28.0,<3.0.0",  # v3 moved/removed NagSuppressions — breaking
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/paved_cdk"]
