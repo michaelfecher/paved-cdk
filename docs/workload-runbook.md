@@ -75,10 +75,11 @@ permissions boundary); you give the **filling** (the handler). Browse the catalo
 
 ## 3. Validate locally — no Node
 ```bash
-make validate     # = uv run python app.py (synth, cdk-nag aspects) + pytest
+make validate     # offline synth via `python app.py` → cdk.out/ (no Node, no AWS)
 ```
 `app.py` synthesizes the CloudFormation template into `cdk.out/` and runs the governance
-aspects (encryption, boundary, cdk-nag) — all in pure Python. Commit when green.
+aspects (encryption, boundary, cdk-nag) — all in pure Python. (`make smoke` adds a quick
+"did a template get produced?" check.) Commit when green.
 
 *(Deploy is separate: `make deploy` needs Node locally, or just push and let the pipeline
 deploy dev → preprod → prod.)*

@@ -2,7 +2,7 @@
 # pure Python (uv). For the daily loop you only need Python + uv; let the CI
 # pipeline handle deploys, or install Node locally only if you want `make deploy`.
 .DEFAULT_GOAL := help
-.PHONY: help install validate synth diff deploy lint test update
+.PHONY: help install validate smoke synth diff deploy lint test update
 
 help:  ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
@@ -19,6 +19,9 @@ validate: install  ## Offline synth via Python only — no Node, no AWS creds
 	CDK_OUTDIR=cdk.out \
 	uv run python app.py
 	@echo "✓ synthesized to cdk.out/ (no Node, no AWS)"
+
+smoke: validate  ## Quick smoke check — confirm a CloudFormation template was produced
+	@ls cdk.out/*.template.json >/dev/null 2>&1 && echo "✓ smoke OK: template synthesized" || { echo "✗ smoke FAILED"; exit 1; }
 
 synth: install  ## [Node] Synthesize via the CDK CLI (cdk-nag runs here)
 	uv run cdk synth

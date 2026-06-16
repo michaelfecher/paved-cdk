@@ -38,4 +38,4 @@ platform_repo:
 platform_version:
   type: str
   help: Platform version (git tag) to pin the library and the reusable pipeline to
-  default: v0.1.0
+  default: v0.2.0
