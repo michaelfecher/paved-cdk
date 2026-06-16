@@ -99,13 +99,15 @@ Two kinds of change ride along on that tag:
 
 ## 5. Pull the update (workload team)
 ```bash
-uvx copier update --trust           # 3-way merge of the scaffold + bumps the tag in pyproject.toml
-                                    # (or: make update)
-uv lock --upgrade-package paved-cdk # re-resolve the library to the new tag
-uv sync                             # install it
-make validate                       # re-check, no Node
+uvx copier update --defaults --trust # non-interactive 3-way merge of the scaffold to the latest tag
+                                     # (or: make update)
+uv lock --upgrade-package paved-cdk  # re-resolve the library to the new tag (optional: see note)
+uv sync                              # install it
+make validate                        # re-check, no Node
 git add -A && git commit -m "chore: update to paved-cdk v0.2.0"
 ```
+`--defaults` keeps your stored answers and prompts for nothing (ideal for CI and demos).
+Plain `uvx copier update` may open an interactive merge/prompt; `--defaults` avoids it.
 `copier update` defaults to the **latest tag**, re-renders the scaffold and writes the new
 `platform_version` into `.copier-answers.yml` **and** the `tag=` in `pyproject.toml`
 (one answer drives both). Conflicts only appear where you edited a scaffolded file by hand;

@@ -39,4 +39,4 @@ test: install  ## Run tests — no Node
 	uv run pytest -q
 
 update:  ## Pull the latest platform template + bump the pinned version — no Node
-	uvx copier update --trust
+	uvx copier update --defaults --trust
