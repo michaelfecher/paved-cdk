@@ -44,5 +44,4 @@ packages - see Consequences.
 ## Notes
 
 - Application code is inherently the workload's and cannot be pre-baked; the catalog
-  pre-bakes everything *around* it. See `docs/building-blocks.md` and
-  `docs/workload-runbook.md`.
+  pre-bakes everything *around* it. See `docs/building-blocks.md`.
