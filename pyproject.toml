@@ -32,8 +32,6 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.ruff.lint.per-file-ignores]
 # Diagrams-as-code: long drawio style/shape string literals are unavoidable.
 "docs/diagrams/gen_hld.py" = ["E501"]
-# Bootstrap renderer: long inline file-content string literals are unavoidable.
-"scripts/onboard.py" = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["packages/paved_cdk/tests"]

@@ -20,3 +20,6 @@ cdk.out/
 
 # NOTE: a consumer project's cdk.context.json is a lockfile and must be committed;
 # this repo (the platform) has none to track.
+
+# Parked: advanced features set aside for the minimal v1 (re-integratable)
+_parked/
