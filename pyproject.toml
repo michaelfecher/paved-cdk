@@ -1,7 +1,7 @@
 [project]
 name = "paved-cdk-workspace"
 version = "0.0.0"
-description = "Paved CDK — monorepo root (uv workspace)"
+description = "Paved CDK - monorepo root (uv workspace)"
 requires-python = ">=3.11"
 
 [tool.uv.workspace]
@@ -22,7 +22,7 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-# Local-only dirs (vendored uv, scratch, CDK output) — absent in a fresh CI checkout,
+# Local-only dirs (vendored uv, scratch, CDK output) - absent in a fresh CI checkout,
 # but excluded so `ruff check .` is clean locally too (this tree is not always git).
 extend-exclude = [".tools", ".tmp", "cdk.out"]
 

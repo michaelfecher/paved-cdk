@@ -23,7 +23,7 @@ class PlatformConfig:
     """Resolved configuration for the AWS account a stack deploys into.
 
     Produced by :class:`paved_cdk.environment.PlatformEnvironment`. Data
-    Scientists never build this by hand — the platform constructs consume it
+    Scientists never build this by hand - the platform constructs consume it
     internally so that no ``vpc=`` / ``env=`` / ``kms=`` arguments leak into user
     code.
     """

@@ -1,23 +1,23 @@
-"""SDK decorators — the lightweight, code-first consumption front end.
+"""SDK decorators - the lightweight, code-first consumption front end.
 
 A Data Scientist annotates plain handler functions; each decorator records a
 *registration* in the module-level :data:`REGISTRY` and returns the function
 **unchanged** (so handlers stay ordinary, importable, testable callables).
 
 ``synth`` later turns these registrations into a
-:class:`~paved_cdk.service.ServiceSpec`. Same intent → same resources, exactly
+:class:`~paved_cdk.service.ServiceSpec`. Same intent -> same resources, exactly
 as the YAML and Copier front ends.
 
 A registration captures enough to build a :class:`~paved_cdk.service.FunctionSpec`:
 
-* ``name``      — the function's ``__name__``.
-* ``module``    — the handler module's short name (``fn.__module__`` last part),
+* ``name``      - the function's ``__name__``.
+* ``module``    - the handler module's short name (``fn.__module__`` last part),
   e.g. ``charge`` for ``handlers/charge.py``. The Lambda handler string is then
   ``"<module>.<name>"`` and the asset dir is the consumer's ``handlers`` package.
-* ``kind``      — one of ``"plain" | "scheduled" | "api"``.
-* ``memory`` / ``timeout`` / ``environment`` — passthrough Lambda sizing.
-* ``schedule``  — EventBridge expression (``scheduled`` kind only).
-* ``method`` / ``path`` — HTTP route (``api`` kind only).
+* ``kind``      - one of ``"plain" | "scheduled" | "api"``.
+* ``memory`` / ``timeout`` / ``environment`` - passthrough Lambda sizing.
+* ``schedule``  - EventBridge expression (``scheduled`` kind only).
+* ``method`` / ``path`` - HTTP route (``api`` kind only).
 """
 
 from __future__ import annotations

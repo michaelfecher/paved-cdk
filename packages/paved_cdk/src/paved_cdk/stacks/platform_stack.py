@@ -1,4 +1,4 @@
-"""PlatformStack — the base stack Data Scientists subclass or instantiate.
+"""PlatformStack - the base stack Data Scientists subclass or instantiate.
 
 It wires the AWS environment from CDK_DEFAULT_ACCOUNT/REGION (so synth-time
 lookups have a concrete account/region) and applies platform governance.
@@ -6,7 +6,7 @@ lookups have a concrete account/region) and applies platform governance.
 The stack name is optionally **prefixed** from the ``STACK_PREFIX`` environment
 variable (set by the pipeline for per-PR preview stacks, e.g. ``pr-123-``). The
 Data Scientist writes ``PlatformStack(app, "my-stack")`` and never deals with the
-prefix — the platform applies it so PR previews get isolated, named stacks.
+prefix - the platform applies it so PR previews get isolated, named stacks.
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ class PlatformStack(cdk.Stack):
             region=os.environ.get("CDK_DEFAULT_REGION"),
         )
         # Pipeline-supplied prefix for ephemeral PR-preview stacks; empty otherwise.
-        # Applied to the stack id (→ CloudFormation stack name) so previews don't
+        # Applied to the stack id (-> CloudFormation stack name) so previews don't
         # collide with the persistent dev/preprod/prod stacks.
         prefix = os.environ.get("STACK_PREFIX", "")
         super().__init__(scope, f"{prefix}{id}" if prefix else id, env=env, **kwargs)

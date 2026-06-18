@@ -1,7 +1,7 @@
 """The core proof: a Data Scientist writes ~3 lines with NO vpc/env/kms/iam args,
 yet the synthesized template carries a KMS-encrypted bucket with public access
 blocked, and a PRIVATE API Gateway locked to the account's execute-api VPC
-endpoint — all resolved from the account baseline."""
+endpoint - all resolved from the account baseline."""
 
 from __future__ import annotations
 

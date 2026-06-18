@@ -8,10 +8,10 @@ help:  ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
 
-install:  ## Install deps (pulls the platform library at the pinned tag) — no Node
+install:  ## Install deps (pulls the platform library at the pinned tag) - no Node
 	uv sync
 
-validate: install  ## Offline synth via Python only — no Node, no AWS creds
+validate: install  ## Offline synth via Python only - no Node, no AWS creds
 	# Synthesizes against the dev baseline (placeholder account id if env unset), runs
 	# the governance aspects, writes cdk.out/. No CDK CLI (Node) and no AWS login needed.
 	CDK_DEFAULT_ACCOUNT=$${PAVED_CDK_DEV_ACCOUNT_ID:-111111111111} \
@@ -20,7 +20,7 @@ validate: install  ## Offline synth via Python only — no Node, no AWS creds
 	uv run python app.py
 	@echo "synthesized to cdk.out/ (no Node, no AWS)"
 
-smoke: validate  ## Quick smoke check — confirm a CloudFormation template was produced
+smoke: validate  ## Quick smoke check - confirm a CloudFormation template was produced
 	@ls cdk.out/*.template.json >/dev/null 2>&1 && echo "smoke OK: template synthesized" || { echo "smoke FAILED"; exit 1; }
 
 synth: install  ## [Node] Synthesize via the CDK CLI
@@ -32,11 +32,11 @@ diff: install  ## [Node] Show changes vs the deployed dev stack
 deploy: install  ## [Node] Deploy to DEV (preprod/prod go through the pipeline)
 	uv run cdk deploy --require-approval never
 
-lint: install  ## Lint — no Node
+lint: install  ## Lint - no Node
 	uv run ruff check .
 
-test: install  ## Run tests — no Node
+test: install  ## Run tests - no Node
 	uv run pytest -q
 
-update:  ## Pull the latest platform template + bump the pinned version — no Node
+update:  ## Pull the latest platform template + bump the pinned version - no Node
 	uvx copier update --defaults --trust

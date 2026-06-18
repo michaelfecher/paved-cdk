@@ -1,4 +1,4 @@
-"""Code-first SDK front end — decorate handlers, then ``synth()``.
+"""Code-first SDK front end - decorate handlers, then ``synth()``.
 
 The lightest of the three consumption models: a Data Scientist annotates plain
 handler functions (:func:`function`, :func:`scheduled`, :data:`api`) and calls

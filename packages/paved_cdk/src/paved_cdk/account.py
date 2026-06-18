@@ -1,15 +1,15 @@
-"""PlatformAccount — one managed AWS account's baseline configuration, in code.
+"""PlatformAccount - one managed AWS account's baseline configuration, in code.
 
 Each team gets three AWS accounts (dev/preprod/prod). The
-per-account baseline — which VPC, subnets, AZs, KMS key, security group and IAM
-permissions boundary the paved road uses — is recorded as plain, typed Python
+per-account baseline - which VPC, subnets, AZs, KMS key, security group and IAM
+permissions boundary the paved road uses - is recorded as plain, typed Python
 data. No SSM, no DynamoDB, no live lookup: CDK reads it deterministically when
 the app runs, so the same commit always yields the same configuration and the
 app synthesizes offline, without AWS credentials.
 
 Adding or changing an account is a reviewed pull request against the registry
 (see ``registry.py`` and ``docs/adr/0008``). CI validates the entry and proves it
-synthesizes before merge — GitHub stays the single source of truth.
+synthesizes before merge - GitHub stays the single source of truth.
 """
 
 from __future__ import annotations
@@ -59,7 +59,7 @@ class PlatformAccount:
         if not self.private_subnet_ids:
             raise PlatformConfigError(
                 f"PlatformAccount {self.account_id} ({self.environment}) has no "
-                f"private_subnet_ids — the paved road needs at least one."
+                f"private_subnet_ids - the paved road needs at least one."
             )
 
     @property

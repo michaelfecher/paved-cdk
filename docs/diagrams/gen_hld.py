@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Generate a draw.io (diagrams.net) HLD with REAL AWS icons.
 
-Diagrams-as-code: emits ``paved-cdk-hld.drawio`` with two pages —
-"As-Is (current)" and "To-Be (target)" — using the official AWS 2019 shape
+Diagrams-as-code: emits ``paved-cdk-hld.drawio`` with two pages -
+"As-Is (current)" and "To-Be (target)" - using the official AWS 2019 shape
 library (``mxgraph.aws4.*``), so Lambda/DynamoDB/S3/SageMaker/KMS/CloudFormation
 render as the real AWS glyphs in draw.io.
 
@@ -125,7 +125,7 @@ steps = [
     ("s2", "2 · Authenticate via OIDC (assume roles)", BOX),
     ("s3", "3 · Fetch config from DynamoDB (VPC, subnets, stack name)", BOX_RED),
     ("s4", "4 · CDK bootstrap (if first deploy)", BOX),
-    ("s5", "5 · CDK synth (Python → CFN JSON)", BOX),
+    ("s5", "5 · CDK synth (Python -> CFN JSON)", BOX),
     ("s6", "6 · CDK deploy", BOX),
     ("s7", "7 · Archive template to S3 + log to DynamoDB", BOX),
 ]
@@ -134,13 +134,13 @@ for cid, label, style in steps:
     asis.node(cid, label, style, 155, y, 250, 30)
     y += 38
 # governance account
-asis.node("govgrp", "Backend AWS Account — Central Governance", ACCOUNT_GROUP, 480, 60, 440, 230)
-asis.icon("cfgdb", "dynamodb", br("Config Table", "Project+Branch → Params"), 520, 110)
+asis.node("govgrp", "Backend AWS Account - Central Governance", ACCOUNT_GROUP, 480, 60, 440, 230)
+asis.icon("cfgdb", "dynamodb", br("Config Table", "Project+Branch -> Params"), 520, 110)
 asis.icon("logdb", "dynamodb", "Log Table", 720, 110)
 asis.icon("arch", "s3", "Template Archive", 620, 205)
 # cfn + resource account
 asis.icon("cfn", "cloudformation", "CloudFormation Stack", 470, 560)
-asis.node("resgrp", "Resource AWS Account — Target Environment", ACCOUNT_GROUP, 590, 470, 470, 330)
+asis.node("resgrp", "Resource AWS Account - Target Environment", ACCOUNT_GROUP, 590, 470, 470, 330)
 res_icons = [
     ("rl", "lambda", "Lambda", 630, 520), ("ri", "identity_and_access_management", "IAM Roles", 770, 520),
     ("rg", "api_gateway", "API Gateway", 910, 520),
@@ -168,16 +168,16 @@ tobe = Page("To-Be (target)", "tobe")
 tobe.icon("dev", "user", "Developer", 30, 320)
 tobe.node("repo", br("GitHub consumer repo", "trunk: main"), GITHUB_FRAME, 150, 318, 230, 56)
 # platform repo frame + contents
-tobe.node("platrepo", "Platform repo — single source of truth", GITHUB_FRAME, 110, 40, 340, 200)
+tobe.node("platrepo", "Platform repo - single source of truth", GITHUB_FRAME, 110, 40, 340, 200)
 tobe.node("lib", "Library: constructs + governance + resolver", BOX, 128, 80, 304, 34)
 tobe.node("reg", "AccountRegistry (static in code)", BOX_GREEN, 128, 128, 304, 34)
 tobe.node("tpl", "Copier template", BOX, 128, 176, 304, 34)
 # pipeline
 tobe.node("rw", br("Reusable workflow", "(workflow_call)"), GHA, 520, 60, 200, 50)
 tobe.node("val", br("validate", "ruff + pytest + synth", "(no AWS login)"), BOX_GREEN, 520, 260, 200, 64)
-tobe.node("ddev", "deploy → dev", BOX, 540, 390, 150, 38)
-tobe.node("dtest", "deploy → preprod", BOX, 540, 460, 150, 38)
-tobe.node("dprod", br("deploy → prod", "(required reviewers)"), BOX, 540, 530, 150, 46)
+tobe.node("ddev", "deploy -> dev", BOX, 540, 390, 150, 38)
+tobe.node("dtest", "deploy -> preprod", BOX, 540, 460, 150, 38)
+tobe.node("dprod", br("deploy -> prod", "(required reviewers)"), BOX, 540, 530, 150, 46)
 # accounts
 tobe.node("devgrp", "AWS dev account", ACCOUNT_GROUP, 780, 330, 470, 120)
 tobe.icon("d_cfn", "cloudformation", "CloudFormation", 810, 365)
@@ -189,7 +189,7 @@ tobe.icon("t_cfn", "cloudformation", "CloudFormation (same baseline)", 810, 500)
 tobe.node("prodgrp", "AWS prod account", ACCOUNT_GROUP, 780, 585, 470, 95)
 tobe.icon("p_cfn", "cloudformation", "CloudFormation (same baseline)", 810, 615)
 # governance (audit only)
-tobe.node("govgrp", "Backend account — Governance (audit only)", ACCOUNT_GROUP, 780, 40, 470, 130)
+tobe.node("govgrp", "Backend account - Governance (audit only)", ACCOUNT_GROUP, 780, 40, 470, 130)
 tobe.icon("g_arch", "s3", "Template archive", 820, 80)
 tobe.icon("g_log", "dynamodb", "Log table", 1000, 80)
 # edges
@@ -215,7 +215,7 @@ LANE_C = ("rounded=0;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#1F6FE
 
 repos = Page("Repos & Workflows", "repos")
 # --- Lane A: Platform repo (source of truth) ---
-repos.node("laneA", "Platform repo — michaelfecher/paved-cdk  (source of truth)",
+repos.node("laneA", "Platform repo - michaelfecher/paved-cdk  (source of truth)",
            LANE, 40, 40, 1180, 230)
 repos.node("lib", "Library (constructs + governance + resolver)", BOX, 70, 80, 250, 30)
 repos.node("reg", "AccountRegistry (static config)", BOX_GREEN, 340, 80, 230, 30)
@@ -223,21 +223,21 @@ repos.node("tpl", "Copier template", BOX, 590, 80, 160, 30)
 repos.node("rwf", "Reusable workflow (cdk-deploy.yml)", GHA, 770, 80, 240, 30)
 repos.node("a_pr", "PR: add account /<br>new construct / template change", BOX, 70, 160, 190, 50)
 repos.node("a_ci", "CI: ruff + pytest +<br>cdk synth", GHA, 300, 160, 180, 50)
-repos.node("a_merge", "merge → main", BOX, 520, 165, 130, 40)
+repos.node("a_merge", "merge -> main", BOX, 520, 165, 130, 40)
 repos.node("a_rel", "tag release vX.Y.Z<br>(GitHub Release)", BOX_GREEN, 690, 160, 170, 50)
 repos.edge("a1", "a_pr", "a_ci")
 repos.edge("a2", "a_ci", "a_merge")
 repos.edge("a3", "a_merge", "a_rel")
 
 # --- Lane B: Consumer repo (per DS project) ---
-repos.node("laneB", "Consumer repo — per DS project", LANE_C, 40, 310, 1180, 300)
+repos.node("laneB", "Consumer repo - per DS project", LANE_C, 40, 310, 1180, 300)
 repos.node("b_scaffold", "copier copy @tag<br>(one-time scaffold)", BOX, 70, 360, 150, 48)
 repos.node("b_edit", "DS edits app.py<br>(PR / push to main)", BOX, 250, 360, 150, 48)
 repos.node("b_call", "thin caller:<br>uses reusable workflow @tag", GHA, 430, 360, 180, 48)
 repos.node("b_val", "validate<br>(no AWS login)", BOX_GREEN, 640, 360, 150, 48)
-repos.node("b_dev", "deploy → dev", BOX, 820, 360, 120, 36)
-repos.node("b_test", "deploy → preprod", BOX, 820, 420, 120, 36)
-repos.node("b_prod", "deploy → prod<br>(reviewers)", BOX, 820, 480, 120, 44)
+repos.node("b_dev", "deploy -> dev", BOX, 820, 360, 120, 36)
+repos.node("b_test", "deploy -> preprod", BOX, 820, 420, 120, 36)
+repos.node("b_prod", "deploy -> prod<br>(reviewers)", BOX, 820, 480, 120, 44)
 repos.icon("c_dev", "cloudformation", "AWS dev", 1000, 356, 44)
 repos.icon("c_test", "cloudformation", "AWS preprod", 1000, 416, 44)
 repos.icon("c_prod", "cloudformation", "AWS prod", 1000, 478, 44)
@@ -255,7 +255,7 @@ repos.edge("bo3", "b_prod", "c_prod", "OIDC")
 # Force a vertical drop (exit bottom of source, enter top of target) so labels
 # land in the inter-lane gap instead of overlapping the top-lane boxes.
 _drop = ";exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
-repos.edge("x_tag", "a_rel", "b_call", "git tag vX.Y.Z — pinned by consumer", EDGE_DASH + _drop)
+repos.edge("x_tag", "a_rel", "b_call", "git tag vX.Y.Z - pinned by consumer", EDGE_DASH + _drop)
 repos.edge("x_tpl", "tpl", "b_scaffold", "copier copy / update", EDGE_DASH + _drop)
 repos.edge("x_reg", "reg", "b_val", "resolved at synth", EDGE_GREEN + _drop)
 

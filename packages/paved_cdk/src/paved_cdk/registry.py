@@ -1,14 +1,14 @@
-"""AccountRegistry — the source of truth for all managed accounts, in code.
+"""AccountRegistry - the source of truth for all managed accounts, in code.
 
 This module is the contract that the SSM well-known paths used to be: it lists
 every AWS account the platform manages and the baseline each one exposes. It is
 plain Python committed to the platform repo, so:
 
-* **Deterministic** — same commit, same config; no value can change underneath a
+* **Deterministic** - same commit, same config; no value can change underneath a
   synth (unlike a live SSM/DynamoDB read).
-* **Reviewable** — onboarding a team or rotating a subnet is a pull request with a
+* **Reviewable** - onboarding a team or rotating a subnet is a pull request with a
   readable diff, validated by CI before merge.
-* **Offline** — CDK synthesizes without AWS credentials.
+* **Offline** - CDK synthesizes without AWS credentials.
 
 Account ids are **not** hard-coded here: each stage reads its id from an
 environment variable and falls back to an illustrative placeholder when that var
@@ -28,7 +28,7 @@ Caveat (PoC): the example baseline is wired to a **default VPC** and its subnets
 which are technically public (``MapPublicIpOnLaunch=true``); a real deployment
 uses dedicated private subnets. The ``preprod``/``prod`` execute-api endpoints are
 illustrative; an interface endpoint must exist in the target account before
-deploying a private API (``SecureDataApi``), otherwise that deploy fails — synth
+deploying a private API (``SecureDataApi``), otherwise that deploy fails - synth
 itself only needs the id string (``from_interface_vpc_endpoint_attributes`` makes
 no AWS call).
 """

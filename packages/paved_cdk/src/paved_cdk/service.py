@@ -1,10 +1,10 @@
-"""Shared service layer — the single convergence point for all consumption models.
+"""Shared service layer - the single convergence point for all consumption models.
 
 A consumer (via SDK decorators, a YAML manifest, or explicit Copier code) ultimately
 produces a :class:`ServiceSpec`. ``build_service`` turns that spec into governed
 resources on the enclosing :class:`PlatformStack`, reusing the catalog constructs.
 
-This guarantees: **same intent → same resources**, regardless of the front end.
+This guarantees: **same intent -> same resources**, regardless of the front end.
 """
 
 from __future__ import annotations
@@ -58,7 +58,7 @@ class ServiceSpec:
 
 
 def _cid(name: str) -> str:
-    """CDK construct id — alnum only (underscores/dashes are not allowed in ids)."""
+    """CDK construct id - alnum only (underscores/dashes are not allowed in ids)."""
     return "".join(p.capitalize() for p in name.replace("-", "_").split("_"))
 
 

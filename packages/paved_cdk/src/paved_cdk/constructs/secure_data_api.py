@@ -1,10 +1,10 @@
-"""SecureDataApi — the reference paved-road construct.
+"""SecureDataApi - the reference paved-road construct.
 
 Demonstrates the platform pattern with two account-aware resources:
 
 * an **encrypted S3 data bucket** (account KMS key, no public access, TLS-only), and
 * a **private REST API Gateway** that is only reachable through the account's
-  ``execute-api`` interface VPC endpoint — i.e. it resolves privately inside the
+  ``execute-api`` interface VPC endpoint - i.e. it resolves privately inside the
   VPC, with no public internet path.
 
 A Data Scientist passes at most an API name; everything security- and
@@ -28,7 +28,7 @@ from ..environment import PlatformEnvironment
 @dataclass
 class SecureDataApiProps:
     """The only knobs a Data Scientist may turn. Deliberately no vpc/kms/endpoint/
-    policy arguments — those come from the account baseline."""
+    policy arguments - those come from the account baseline."""
 
     api_name: str = "data-api"
 
@@ -49,7 +49,7 @@ class SecureDataApi(Construct):
         props = props or SecureDataApiProps()
         cfg = PlatformEnvironment.of(self)
 
-        # 1. Encrypted data bucket — account KMS key, no public access, TLS-only.
+        # 1. Encrypted data bucket - account KMS key, no public access, TLS-only.
         self.bucket = s3.Bucket(
             self,
             "DataBucket",
@@ -61,7 +61,7 @@ class SecureDataApi(Construct):
             removal_policy=RemovalPolicy.RETAIN if cfg.is_production else RemovalPolicy.DESTROY,
         )
 
-        # 2. Private REST API — only the account's execute-api VPC endpoint may
+        # 2. Private REST API - only the account's execute-api VPC endpoint may
         #    invoke it; everything else is denied. This is the "private
         #    resolution": clients in the VPC reach it via the endpoint's private
         #    DNS, never the public internet.

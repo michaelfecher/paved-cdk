@@ -1,6 +1,6 @@
-# ADR 0005 — Governance via Aspects + cdk-nag, applied automatically
+# ADR 0005 - Governance via Aspects + cdk-nag, applied automatically
 
-- Status: Accepted — **amended 2026-06-18: cdk-nag removed for now**
+- Status: Accepted - **amended 2026-06-18: cdk-nag removed for now**
 - Date: 2026-05-27
 
 > **Amendment (2026-06-18):** the cdk-nag `AwsSolutionsChecks` pass and its
@@ -21,12 +21,12 @@ fails.
 `PlatformStack.__init__`, applies:
 
 1. **Permissions boundary** at **stack scope** via `PermissionsBoundary.of(stack)`
-   — covers every IAM role, including those inside vendor constructs.
+   - covers every IAM role, including those inside vendor constructs.
 2. **Mandatory tags** validated deterministically against the caller-provided tag
    dict (not fragile tag-propagation introspection), then applied with
    `Tags.of(stack)`.
 3. **Fail-closed encryption** via `EncryptionEnforcerAspect` (errors on synth if a
-   known encryptable resource is unencrypted) — deterministic because properties
+   known encryptable resource is unencrypted) - deterministic because properties
    are set before aspects visit.
 4. **cdk-nag** `AwsSolutionsChecks` at **app scope** (added once), with
    pre-approved `NagSuppressions` so Data Scientists never read nag output.

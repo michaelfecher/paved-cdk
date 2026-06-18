@@ -1,4 +1,4 @@
-"""SDK synth entrypoint — the consumer's ``app.py`` calls :func:`synth`.
+"""SDK synth entrypoint - the consumer's ``app.py`` calls :func:`synth`.
 
 It is the SDK front end's convergence onto the shared service contract:
 
@@ -78,7 +78,7 @@ def _import_handlers() -> None:
     for mod in pkgutil.iter_modules(pkg.__path__, prefix=f"{HANDLERS_PKG}."):
         try:
             importlib.import_module(mod.name)
-        except Exception:  # noqa: BLE001 — one bad handler must not sink the synth
+        except Exception:  # noqa: BLE001 - one bad handler must not sink the synth
             logger.exception("Failed importing handler module '%s'; skipping.", mod.name)
 
 
