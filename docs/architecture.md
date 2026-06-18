@@ -82,7 +82,7 @@ flowchart TB
    synth differently), a *second* source of truth outside Git, no PR/diff/test on config
    changes. It also reduces CDK to a templater fed by a table — which is exactly why "why
    even use CDK?" comes up.
-2. **No validation/governance gate.** No `ruff` / `pytest` / `cdk-nag` step before deploy.
+2. **No validation/governance gate.** No `ruff` / `pytest` / `cdk synth` validation before deploy.
 3. **Branch-per-environment** (development/main/production → DEV/TEST/PROD) invites drift
    between branches and merge pain.
 4. **The platform itself is invisible** — only pipeline + config fetch are shown; the
