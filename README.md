@@ -51,7 +51,6 @@ uv run copier copy . /tmp/demo \          # scaffold a sample consumer project (
 
 A consumer team scaffolds from the **git tag** instead:
 `copier copy --vcs-ref v0.1.0 gh:michaelfecher/paved-cdk my-project`.
-See the step-by-step [workload runbook](docs/workload-runbook.md).
 
 ## Consumer (Data Scientist) experience
 

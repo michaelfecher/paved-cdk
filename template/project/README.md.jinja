@@ -14,14 +14,19 @@ package registry needed). `uv sync` clones it at tag `{{ platform_version }}`.
 
 ## Deployment - three stages, one pipeline
 
-Pushing to `main` runs the **central, shared pipeline** (maintained in
-`{{ platform_repo }}`): lint -> synth -> deploy **dev -> preprod -> prod**.
+The **central, shared pipeline** (maintained in `{{ platform_repo }}`) decides what
+each trigger does:
+
+- **push to `main`** -> deploy to **dev**
+- **open/update a PR** -> ephemeral preview stack in dev (destroyed when the PR closes)
+- **push a `vX.Y.Z` tag** -> release: promote **dev -> preprod -> prod**
+
 Every DS project runs the exact same pipeline; it updates when you `copier update`
 (which bumps the `@{{ platform_version }}` ref in `.github/workflows/deploy.yml`).
 
-One-time per repo: create GitHub Environments `dev`, `test`, `prod`, each with a
-secret `AWS_DEPLOY_ROLE_ARN` (the OIDC deploy role of that account) and, for
-`prod`, required reviewers. Your team's three accounts are provisioned for you.
+You configure **nothing** AWS-specific per repo: the platform owns all deploy auth
+(OIDC roles and account ids) centrally. Your team's three accounts are provisioned
+for you.
 
 ## Pulling platform updates
 
