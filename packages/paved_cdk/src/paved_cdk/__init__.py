@@ -6,6 +6,7 @@ from .config import PlatformConfig, PlatformConfigError
 from .constructs import SecureDataApi, SecureDataApiProps
 from .environment import PlatformEnvironment
 from .registry import DEFAULT_REGISTRY, AccountRegistry
+from .service import ApiRoute, FunctionSpec, NotebookSpec, ServiceSpec, build_service
 from .stacks import PlatformStack
 
 __version__ = "0.1.0"
@@ -23,4 +24,10 @@ __all__ = [
     "SecureDataApiProps",
     "SecureLambda",
     "SecureLambdaProps",
+    # Shared service layer (used by all consumption frontends)
+    "ServiceSpec",
+    "FunctionSpec",
+    "NotebookSpec",
+    "ApiRoute",
+    "build_service",
 ]

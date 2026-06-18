@@ -353,6 +353,7 @@ dependencies = [
     { name = "aws-cdk-lib" },
     { name = "cdk-nag" },
     { name = "constructs" },
+    { name = "pyyaml" },
 ]
 
 [package.optional-dependencies]
@@ -367,6 +368,7 @@ requires-dist = [
     { name = "cdk-nag", specifier = ">=2.28.0,<3.0.0" },
     { name = "constructs", specifier = ">=10.0.0,<11.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
+    { name = "pyyaml", specifier = ">=6" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
 ]
 provides-extras = ["dev"]
