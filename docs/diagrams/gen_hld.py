@@ -174,7 +174,7 @@ tobe.node("reg", "AccountRegistry (static in code)", BOX_GREEN, 128, 128, 304, 3
 tobe.node("tpl", "Copier template", BOX, 128, 176, 304, 34)
 # pipeline
 tobe.node("rw", br("Reusable workflow", "(workflow_call)"), GHA, 520, 60, 200, 50)
-tobe.node("val", br("validate", "ruff + pytest + synth + cdk-nag", "(no AWS login)"), BOX_GREEN, 520, 260, 200, 64)
+tobe.node("val", br("validate", "ruff + pytest + synth", "(no AWS login)"), BOX_GREEN, 520, 260, 200, 64)
 tobe.node("ddev", "deploy → dev", BOX, 540, 390, 150, 38)
 tobe.node("dtest", "deploy → preprod", BOX, 540, 460, 150, 38)
 tobe.node("dprod", br("deploy → prod", "(required reviewers)"), BOX, 540, 530, 150, 46)
@@ -222,7 +222,7 @@ repos.node("reg", "AccountRegistry (static config)", BOX_GREEN, 340, 80, 230, 30
 repos.node("tpl", "Copier template", BOX, 590, 80, 160, 30)
 repos.node("rwf", "Reusable workflow (cdk-deploy.yml)", GHA, 770, 80, 240, 30)
 repos.node("a_pr", "PR: add account /<br>new construct / template change", BOX, 70, 160, 190, 50)
-repos.node("a_ci", "CI: ruff + pytest +<br>cdk synth + cdk-nag", GHA, 300, 160, 180, 50)
+repos.node("a_ci", "CI: ruff + pytest +<br>cdk synth", GHA, 300, 160, 180, 50)
 repos.node("a_merge", "merge → main", BOX, 520, 165, 130, 40)
 repos.node("a_rel", "tag release vX.Y.Z<br>(GitHub Release)", BOX_GREEN, 690, 160, 170, 50)
 repos.edge("a1", "a_pr", "a_ci")

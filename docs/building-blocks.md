@@ -103,16 +103,15 @@ Each block lists **What · How it's built · Where · Why**.
 - **Why:** the DS gets environment wiring + governance + resolved config by writing one line.
 
 ### Governance — guardrails applied to every stack
-- **What:** permissions boundary, mandatory tags, fail-closed encryption, and cdk-nag —
-  enforced in code, not by docs.
+- **What:** permissions boundary, mandatory tags, and fail-closed encryption —
+  enforced in code, not by docs. (cdk-nag was removed for now.)
 - **How it's built:** `apply_platform_governance` (1) adds `PermissionsBoundaryAspect`, an
   `IAspect` that sets `permissionsBoundary` on **every** `CfnRole` (including those created
   inside vendor constructs); (2) adds platform default tags + the `Environment` tag;
   (3) validates the mandatory tags `Owner/Team/CostCenter/Environment`, raising
   `PlatformConfigError` (synth fails) if any are missing; (4) adds `EncryptionEnforcerAspect`
-  (fail-closed on unencrypted resources); (5) registers cdk-nag `AwsSolutionsChecks` once at
-  app scope plus pre-approved `NagSuppressions` (IAM4/IAM5, with written justification) so the
-  DS never reads nag output.
+  (fail-closed on unencrypted resources). (A cdk-nag `AwsSolutionsChecks` pass was here and
+  was removed for now; re-add in `apply_platform_governance` when desired.)
 - **Where:** `aspects/governance.py`, `aspects/permissions_boundary.py`,
   `aspects/encryption_enforcer.py`
 - **Why:** governance that can't be forgotten — it runs whether or not the DS knows it exists.
@@ -170,7 +169,7 @@ Each block lists **What · How it's built · Where · Why**.
 ### Reusable workflow — the uniform pipeline (ADR 0011)
 - **What:** the single shared CI/CD pipeline both the master and every consumer run.
 - **How it's built:** `.github/workflows/cdk-deploy.yml` (`workflow_call`), `if:`-gated by
-  event — **validate** (ruff + `cdk synth` + cdk-nag, **no AWS login**) always; then:
+  event — **validate** (ruff + `cdk synth`, **no AWS login**) always; then:
   - **PR (same-repo)** → **preview**: deploy an ephemeral `pr-<n>-<slug>` stack to **dev**
     (`STACK_PREFIX`), comment on the PR; **PR closed** → `cdk destroy` it.
   - **push `main`** → **deploy-dev** (`<slug>`).

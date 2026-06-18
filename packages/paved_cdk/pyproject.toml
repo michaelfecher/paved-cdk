@@ -8,7 +8,6 @@ readme = "README.md"
 dependencies = [
     "aws-cdk-lib>=2.150.0,<3.0.0",
     "constructs>=10.0.0,<11.0.0",
-    "cdk-nag>=2.28.0,<3.0.0",  # v3 moved/removed NagSuppressions — breaking
     "pyyaml>=6",  # declarative (YAML) consumption model
 ]
 

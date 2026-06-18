@@ -21,7 +21,6 @@ from aws_cdk import Duration, RemovalPolicy
 from aws_cdk import aws_ec2 as ec2
 from aws_cdk import aws_lambda as _lambda
 from aws_cdk import aws_logs as logs
-from cdk_nag import NagSuppressions
 from constructs import Construct
 
 from ..environment import PlatformEnvironment
@@ -75,15 +74,6 @@ class SecureLambda(Construct):
             timeout=Duration.seconds(props.timeout_seconds),
             memory_size=props.memory_mb,
             log_group=log_group,
-        )
-
-        NagSuppressions.add_resource_suppressions(
-            self.function,
-            [
-                {"id": "AwsSolutions-L1", "reason": "Runtime is pinned and upgraded "
-                 "deliberately through platform releases, not implicitly."},
-            ],
-            apply_to_children=True,
         )
 
     @property

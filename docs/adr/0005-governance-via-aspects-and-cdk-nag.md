@@ -1,7 +1,13 @@
 # ADR 0005 — Governance via Aspects + cdk-nag, applied automatically
 
-- Status: Accepted
+- Status: Accepted — **amended 2026-06-18: cdk-nag removed for now**
 - Date: 2026-05-27
+
+> **Amendment (2026-06-18):** the cdk-nag `AwsSolutionsChecks` pass and its
+> `NagSuppressions` were **removed for now** from `apply_platform_governance` and the
+> constructs. The Aspect guardrails below (permissions boundary, mandatory tags,
+> fail-closed encryption) **remain**. cdk-nag can be re-added in one place
+> (`apply_platform_governance`) when desired; the rest of this ADR is kept as the rationale.
 
 ## Context
 

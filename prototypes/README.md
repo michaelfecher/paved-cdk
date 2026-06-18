@@ -34,7 +34,7 @@ Secrets-Manager reference) — the consumer sets **none** of that, in any varian
 | `AWS::Events::Rule` | 2 | 2 | 2 |
 | `AWS::ApiGateway::Method` | 1 | 1 | 1 |
 
-Governance (boundary, KMS, tags, cdk-nag, in-VPC, private API) is identical in all three.
+Governance (boundary, KMS, tags, in-VPC, private API) is identical in all three.
 **Difference = only who writes what.** See [`COMPARISON.md`](COMPARISON.md).
 
 ## Run them yourself (offline, no Node beyond the CDK assembly, no AWS)

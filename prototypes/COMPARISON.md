@@ -2,7 +2,7 @@
 
 All variants run on the **same Paved CDK kernel**: deterministic per-stage config from
 the in-code registry (VPC/subnet/KMS/boundary, Databricks via Secrets-Manager reference),
-governance (boundary/KMS/tags/cdk-nag), the event-driven pipeline (PR preview → dev,
+governance (boundary/KMS/tags), the event-driven pipeline (PR preview → dev,
 release tag → preprod → prod), versioned-dependency distribution, and **CDK only in CI**.
 The variants differ **only at the consumer authoring surface**.
 

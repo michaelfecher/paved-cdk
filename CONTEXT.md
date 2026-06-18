@@ -27,8 +27,8 @@ secure, compliant stack writing ~10 lines and **zero** infrastructure decisions.
   contract (ADR 0008): values live in git, deterministic, PR-reviewed.
 - **PlatformStack** — base stack that wires `env` from `CDK_DEFAULT_*` and applies
   governance automatically.
-- **Governance** — permissions boundary, mandatory tags, fail-closed encryption
-  and cdk-nag, applied by `apply_platform_governance` without DS involvement.
+- **Governance** — permissions boundary, mandatory tags and fail-closed encryption,
+  applied by `apply_platform_governance` without DS involvement. (cdk-nag removed for now.)
 - **Deterministic resolution** — baseline values are concrete strings fed to the CDK
   `from_*` importers; account ids come from env vars (placeholder fallback), the rest is
   static. No live SSM/DynamoDB lookup, no AWS credentials at synth. See ADR 0008.

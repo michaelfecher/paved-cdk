@@ -20,7 +20,6 @@ from aws_cdk import RemovalPolicy
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_s3 as s3
-from cdk_nag import NagSuppressions
 from constructs import Construct
 
 from ..environment import PlatformEnvironment
@@ -60,14 +59,6 @@ class SecureDataApi(Construct):
             enforce_ssl=True,
             versioned=cfg.is_production,
             removal_policy=RemovalPolicy.RETAIN if cfg.is_production else RemovalPolicy.DESTROY,
-        )
-        NagSuppressions.add_resource_suppressions(
-            self.bucket,
-            [
-                {"id": "AwsSolutions-S1", "reason": "Reference scaffold data bucket; "
-                 "S3 server access logging is layered by the consumer (or a central "
-                 "logging bucket) per their data-classification needs."},
-            ],
         )
 
         # 2. Private REST API — only the account's execute-api VPC endpoint may
@@ -111,29 +102,6 @@ class SecureDataApi(Construct):
                 request_templates={"application/json": '{"statusCode": 200}'},
             ),
             method_responses=[apigateway.MethodResponse(status_code="200")],
-        )
-
-        # Pre-approved suppressions: this is a network-isolated reference scaffold.
-        # Consumer projects layer auth / WAF / access logging for their use case.
-        NagSuppressions.add_resource_suppressions(
-            self.api,
-            [
-                {"id": "AwsSolutions-APIG1", "reason": "Private API reference scaffold; "
-                 "stage access logging is enabled by the consumer once a real "
-                 "integration and a log destination are wired."},
-                {"id": "AwsSolutions-APIG2", "reason": "Reference scaffold; request "
-                 "validation is added per real integration."},
-                {"id": "AwsSolutions-APIG3", "reason": "Private API (VPC-endpoint only); "
-                 "WAF is layered by the consumer when exposed."},
-                {"id": "AwsSolutions-APIG4", "reason": "Access is restricted to the "
-                 "account execute-api VPC endpoint via resource policy; method-level "
-                 "auth is added per real integration."},
-                {"id": "AwsSolutions-APIG6", "reason": "Reference scaffold; per-method "
-                 "CloudWatch logging is enabled by the consumer."},
-                {"id": "AwsSolutions-COG4", "reason": "Private API uses a VPC-endpoint "
-                 "resource policy rather than a Cognito authorizer."},
-            ],
-            apply_to_children=True,
         )
 
     @property

@@ -101,7 +101,7 @@ flowchart TB
     TPL["Copier template"]
   end
 
-  RW --> VAL["validate<br/>ruff + pytest + cdk synth + cdk-nag<br/>(no AWS login)"]
+  RW --> VAL["validate<br/>ruff + pytest + cdk synth<br/>(no AWS login)"]
   VAL --> DEVS["deploy → dev"] --> TESTS["deploy → preprod"] --> PRODS["deploy → prod<br/>(required reviewers)"]
 
   REG -.resolved at synth.-> VAL
@@ -123,7 +123,7 @@ flowchart TB
 ```
 
 **What changes:** DynamoDB **config** table removed → static `AccountRegistry` in the repo
-(deterministic, PR-reviewed); a **validate gate** (ruff + pytest + cdk-nag) runs before any
+(deterministic, PR-reviewed); a **validate gate** (ruff + pytest + cdk synth) runs before any
 deploy, with **no AWS login** because synth is offline; **branch-per-env → single trunk +
 stage promotion** (dev → preprod → prod via GitHub Environments); the **library + Copier
 template** are first-class. The DynamoDB **log** table and S3 **template archive** stay —
@@ -155,7 +155,7 @@ flowchart TB
     PS[PlatformStack]
     ENV[PlatformEnvironment<br/>resolver]
     REG[(AccountRegistry<br/>static in code · source of truth)]
-    GOV[apply_platform_governance<br/>Aspects + cdk-nag]
+    GOV[apply_platform_governance<br/>Aspects: boundary, tags, encryption]
     L3[SecureDataApi L3]
   end
 
@@ -258,11 +258,9 @@ flowchart LR
   G --> TAGS["2 · Default tags + Environment tag"]
   G --> VAL{"3 · Mandatory tags present?<br/>Owner · Team · CostCenter · Environment"}
   G --> ENC["4 · EncryptionEnforcerAspect<br/>fail-closed on missing encryption"]
-  G --> NAG["5 · cdk-nag AwsSolutionsChecks<br/>at app scope (once)"]
 
   VAL -- no --> ERR[["PlatformConfigError<br/>with remediation → synth fails"]]
   VAL -- yes --> OK([continue])
-  NAG --> SUP["pre-registered NagSuppressions<br/>IAM4/IAM5 with justification<br/>→ DS never reads nag output"]
 
   classDef fail fill:#fdd,stroke:#c33
   class ERR fail
@@ -289,7 +287,7 @@ flowchart TB
   end
 
   THIN -->|"@tag"| RW
-  RW --> V["validate<br/>ruff · cdk synth · cdk-nag<br/>(no AWS login)"]
+  RW --> V["validate<br/>ruff · cdk synth<br/>(no AWS login)"]
   V --> D{"Event?"}
 
   D -- "PR (same-repo)" --> PV["preview → dev<br/>pr-N-stack (ephemeral)"]
@@ -484,7 +482,7 @@ C4Component
         Component(reg, "AccountRegistry", "Static config", "account id to PlatformAccount")
         Component(acct, "PlatformAccount", "frozen dataclass", "One account's baseline (VPC, KMS, boundary)")
         Component(cfg, "PlatformConfig", "frozen dataclass", "Resolved, typed config")
-        Component(gov, "Governance Aspects + cdk-nag", "cdk.IAspect", "Boundary, tags, encryption, compliance")
+        Component(gov, "Governance Aspects", "cdk.IAspect", "Boundary, tags, encryption")
         Component(nb, "SecureDataApi", "L3 construct", "Encrypted bucket + private API, consumes PlatformConfig")
     }
 

@@ -14,8 +14,8 @@ a structure that scales as bricks are added without forcing every consumer to ca
 
 Model the constructs as an **à-la-carte catalog**:
 
-- **Mandatory paved road:** `PlatformStack` + governance (boundary, tags, encryption,
-  cdk-nag) — always applied, not opt-out.
+- **Mandatory paved road:** `PlatformStack` + governance (boundary, tags, encryption)
+  — always applied, not opt-out.
 - **Optional bricks:** account-aware constructs, **namespaced by domain**
   (`paved_cdk.storage`, `paved_cdk.compute`, …) and re-exported at the top level. A consumer
   imports and **instantiates only what it needs**.

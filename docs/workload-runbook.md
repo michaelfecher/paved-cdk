@@ -78,7 +78,7 @@ permissions boundary); you give the **filling** (the handler). Browse the catalo
 make validate     # offline synth via `python app.py` → cdk.out/ (no Node, no AWS)
 ```
 `app.py` synthesizes the CloudFormation template into `cdk.out/` and runs the governance
-aspects (encryption, boundary, cdk-nag) — all in pure Python. (`make smoke` adds a quick
+aspects (encryption, boundary) — all in pure Python. (`make smoke` adds a quick
 "did a template get produced?" check.) Commit when green.
 
 *(Deploy is separate: `make deploy` needs Node locally, or just push and let the pipeline

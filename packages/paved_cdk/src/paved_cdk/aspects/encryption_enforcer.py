@@ -10,7 +10,7 @@ encryption is **not** on by default and a data scientist could realistically
 create something unencrypted. It is a safety net, not a complete control —
 services encrypted-by-default (e.g. DynamoDB) are intentionally omitted, and for
 S3 it only asserts that *some* encryption is configured, not that it is KMS (the
-platform's own constructs wire the account KMS key). Pair it with cdk-nag and an
+platform's own constructs wire the account KMS key). Pair it with an
 SCP/permissions boundary for defence in depth.
 """
 

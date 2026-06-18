@@ -15,7 +15,7 @@ package registry needed). `uv sync` clones it at tag `{{ platform_version }}`.
 ## Deployment — three stages, one pipeline
 
 Pushing to `main` runs the **central, shared pipeline** (maintained in
-`{{ platform_repo }}`): lint → synth + cdk-nag → deploy **dev → test → prod**.
+`{{ platform_repo }}`): lint → synth → deploy **dev → preprod → prod**.
 Every DS project runs the exact same pipeline; it updates when you `copier update`
 (which bumps the `@{{ platform_version }}` ref in `.github/workflows/deploy.yml`).
 

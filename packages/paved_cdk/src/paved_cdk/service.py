@@ -16,7 +16,6 @@ from aws_cdk import aws_events as events
 from aws_cdk import aws_events_targets as targets
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as _lambda
-from cdk_nag import NagSuppressions
 from constructs import Construct
 
 from .compute.secure_lambda import SecureLambda, SecureLambdaProps
@@ -152,18 +151,6 @@ def _private_api(scope: Construct, cfg) -> apigateway.RestApi:
             vpc_endpoints=[cfg.execute_api_vpc_endpoint],
         ),
         policy=policy,
-    )
-    NagSuppressions.add_resource_suppressions(
-        api,
-        [
-            {"id": "AwsSolutions-APIG1", "reason": "Access logging added per integration."},
-            {"id": "AwsSolutions-APIG2", "reason": "Request validation added per integration."},
-            {"id": "AwsSolutions-APIG3", "reason": "Private API; WAF layered by consumer."},
-            {"id": "AwsSolutions-APIG4", "reason": "Restricted to the account execute-api VPCe."},
-            {"id": "AwsSolutions-APIG6", "reason": "Per-method logging enabled by the consumer."},
-            {"id": "AwsSolutions-COG4", "reason": "Private API uses a VPCe resource policy."},
-        ],
-        apply_to_children=True,
     )
     return api
 

@@ -46,10 +46,10 @@ env:
 
 jobs:
   validate:
-    name: lint + synth + cdk-nag
+    name: lint + synth
     runs-on: ubuntu-latest
-    # No AWS role: synth is offline & deterministic (ADR 0008). Pure Python, no Node
-    # needed beyond the CDK CLI which only assembles — cdk-nag fails the build here.
+    # No AWS role: synth is offline & deterministic (ADR 0008). Governance aspects
+    # (permissions boundary, encryption enforcer) run during synth.
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -59,7 +59,7 @@ jobs:
       - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
       - run: uv sync
       - run: uv run ruff check .
-      - name: cdk synth (cdk-nag runs as an App Aspect; violations fail here)
+      - name: cdk synth (governance aspects run; synth fails on violations)
         run: uv run cdk synth
 
   # ---- Pull request: ephemeral preview stack in the DEV account ----------------

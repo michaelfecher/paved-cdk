@@ -32,8 +32,7 @@ privilege escalation. These are decisions worth recording, not just patches.
 - **No GitHub-expression injection.** Values flow into `github-script` via `env:`, read as
   `process.env.*` — never interpolated into the script body.
 - **Escalation-proof permissions boundary.** The boundary denies creating/altering IAM
-  principals without the same boundary, and protects itself (deny edits to its own policy) —
-  so the cdk-nag IAM4/IAM5 suppressions ("constrained by the boundary") actually hold.
+  principals without the same boundary, and protects itself (deny edits to its own policy).
 
 ## Consequences
 
@@ -46,6 +45,6 @@ privilege escalation. These are decisions worth recording, not just patches.
 
 - Out of repo and still required: the OIDC **trust policy** of `AWS_DEPLOY_ROLE_ARN` must
   restrict `sub` to `repo:<org>/<repo>:environment:<stage>`, else any repo could assume it.
-- `cdk-nag` coverage was broadened in the same pass: `EncryptionEnforcerAspect` checks 11
+- `EncryptionEnforcerAspect` coverage was broadened in the same pass: it checks 11
   resource types (S3, RDS, EFS, EBS, SNS, SQS, SageMaker, OpenSearch, Redshift) with correct
   boolean semantics; `SecureDataApi`/`SecureLambda` carry scoped, justified suppressions only.
