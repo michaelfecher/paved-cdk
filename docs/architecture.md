@@ -16,8 +16,8 @@ record the rationale.
 >
 > Generated from `docs/diagrams/gen_hld.py` (diagrams-as-code). Regenerate the `.drawio`
 > with `python3 docs/diagrams/gen_hld.py`. For PNGs, the `drawio` CLI `--page-index` flag is
-> unreliable (it re-exports page 0); the robust recipe is to **split the multi-page file and
-> export each single page**:
+> unreliable (it re-exports page 0); instead **split the multi-page file and export each
+> single page**:
 > ```bash
 > python3 - <<'PY'
 > import re, pathlib
@@ -126,7 +126,7 @@ flowchart TB
 (deterministic, PR-reviewed); a **validate gate** (ruff + pytest + cdk synth) runs before any
 deploy, with **no AWS login** because synth is offline; **branch-per-env → single trunk +
 stage promotion** (dev → preprod → prod via GitHub Environments); the **library + Copier
-template** are first-class. The DynamoDB **log** table and S3 **template archive** stay —
+template** are core parts. The DynamoDB **log** table and S3 **template archive** stay —
 that is a legitimate audit trail.
 
 ---

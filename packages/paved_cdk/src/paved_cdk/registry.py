@@ -12,7 +12,7 @@ plain Python committed to the platform repo, so:
 
 Account ids are **not** hard-coded here: each stage reads its id from an
 environment variable and falls back to an illustrative placeholder when that var
-is unset, so the library imports, synthesizes and tests offline out of the box
+is unset, so the library imports, synthesizes and tests offline
 while real account numbers stay out of the public repo. The KMS and permissions
 boundary ARNs are derived from the resolved account id, so they carry no real
 account number either. Everything else (VPC, subnets, AZs, KMS key id, the

@@ -20,9 +20,9 @@ This is intentionally a set of **1–3 options to pick from** — not a single m
 | Flexibilität / Edge-Cases | SDK-Vokabular (+ Escape nötig) | **maximal** (rohes CDK möglich) | Schema-Grenze (kein Escape) |
 | Anzahl-Varianz (3 vs 5 Lambdas) | trivial | trivial | trivial |
 | Typ-Varianz (Notebook/ECS/Glue …) | nur was das SDK anbietet | **alles** (Katalog + rohes CDK) | nur was das Schema kennt |
-| Bootstrap = 1× Plattform-PR | ✔ | ✔ | ✔ |
-| Updates = nur Pin-Bump, kein Überschreiben | ✔ | ✔ (+`_skip_if_exists`) | ✔ |
-| Per-Stage-Config vorkonfiguriert | ✔ (Kern) | ✔ (Kern) | ✔ (Kern) |
+| Bootstrap = 1× Plattform-PR | ja | ja | ja |
+| Updates = nur Pin-Bump, kein Überschreiben | ja | ja (+`_skip_if_exists`) | ja |
+| Per-Stage-Config vorkonfiguriert | ja (Kern) | ja (Kern) | ja (Kern) |
 
 ## Auf die Leitziele gemünzt
 - **„So wenig wie möglich deklarativ / alles Python":** schließt **YAML-Variante** faktisch aus; **SDK** und **Copier/explizit** sind beide Python-only.

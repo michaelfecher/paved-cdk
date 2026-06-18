@@ -67,7 +67,7 @@ SecureLambda(stack, "Scoring", props=SecureLambdaProps(
 ```
 Validate — **no Node, no AWS**:
 ```bash
-make validate     # → ✓ synthesized to cdk.out/
+make validate     # -> synthesized to cdk.out/
 ```
 Open `cdk.out/demo-scoring.template.json` to show: Lambda + LogGroup + KMS bucket + private API — securely wired, none of which the DS had to write.
 

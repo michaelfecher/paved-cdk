@@ -18,10 +18,10 @@ validate: install  ## Offline synth via Python only — no Node, no AWS creds
 	CDK_DEFAULT_REGION=$${PAVED_CDK_REGION:-eu-west-1} \
 	CDK_OUTDIR=cdk.out \
 	uv run python app.py
-	@echo "✓ synthesized to cdk.out/ (no Node, no AWS)"
+	@echo "synthesized to cdk.out/ (no Node, no AWS)"
 
 smoke: validate  ## Quick smoke check — confirm a CloudFormation template was produced
-	@ls cdk.out/*.template.json >/dev/null 2>&1 && echo "✓ smoke OK: template synthesized" || { echo "✗ smoke FAILED"; exit 1; }
+	@ls cdk.out/*.template.json >/dev/null 2>&1 && echo "smoke OK: template synthesized" || { echo "smoke FAILED"; exit 1; }
 
 synth: install  ## [Node] Synthesize via the CDK CLI
 	uv run cdk synth

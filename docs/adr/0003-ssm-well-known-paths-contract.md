@@ -3,7 +3,7 @@
 - Status: **Superseded by ADR 0008** (static account registry in code)
 - Date: 2026-05-27
 
-> ⚠ Superseded on 2026-06-02. The baseline contract is no longer SSM paths but a
+> **Superseded.** Superseded on 2026-06-02. The baseline contract is no longer SSM paths but a
 > static `AccountRegistry` in the platform repo (deterministic, GitHub as source of
 > truth). `ssm_paths.py` has been removed. Kept for the rationale of *why* a contract
 > seam between Landing Zone and platform was needed in the first place — that need

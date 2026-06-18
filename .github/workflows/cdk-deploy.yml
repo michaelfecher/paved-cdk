@@ -102,7 +102,7 @@ jobs:
         with:
           script: |
             const marker = '<!-- cdk-preview -->';
-            const body = `${marker}\n🚀 **Preview deployed to dev** as \`pr-${process.env.PR}-${process.env.STACK}\` (ephemeral; destroyed when this PR closes).`;
+            const body = `${marker}\n**Preview deployed to dev** as \`pr-${process.env.PR}-${process.env.STACK}\` (ephemeral; destroyed when this PR closes).`;
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
             const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });

@@ -3,7 +3,7 @@
 - Status: **Superseded by ADR 0008** (static account registry in code)
 - Date: 2026-05-27
 
-> ⚠ Superseded on 2026-06-02. With the static registry there is no live SSM
+> **Superseded.** Superseded on 2026-06-02. With the static registry there is no live SSM
 > resolution at all: all values are concrete strings in code, fed to the CDK
 > `from_*` importers, so neither synth-time nor deploy-time SSM modes apply. The
 > synth-time AWS-credential requirement and the `cdk.context.json` staleness footgun
