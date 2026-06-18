@@ -1,7 +1,7 @@
 # Building Blocks & Workflows — Paved CDK
 
 > **Scope note.** Committed **minimal v1** = kernel + `SecureLambda` + `SecureDataApi` +
-> Copier template. The reusable pipeline, the SDK/declarative frontends, the
+> Copier template. The reusable pipeline, the SDK/declarative variants, the
 > service-orchestration layer, prototypes and onboarding are **parked** (`_parked/`,
 > git-ignored). The blocks below describing those reflect the planned design.
 
