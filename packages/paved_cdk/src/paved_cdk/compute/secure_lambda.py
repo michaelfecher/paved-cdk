@@ -1,4 +1,4 @@
-"""SecureLambda — the paved-road Lambda brick.
+"""SecureLambda - the paved-road Lambda brick.
 
 A data scientist supplies only the *code*, *handler* and *runtime*; everything
 security- and network-relevant is wired from the resolved :class:`PlatformConfig`:
@@ -9,7 +9,7 @@ security- and network-relevant is wired from the resolved :class:`PlatformConfig
 * the IAM execution role carries the **permissions boundary** automatically (via
   the platform aspect on the stack).
 
-The ``code`` comes from the *consumer* repo (e.g. ``Code.from_asset("src/...")``) —
+The ``code`` comes from the *consumer* repo (e.g. ``Code.from_asset("src/...")``) -
 the construct is the secure envelope, the workload provides the filling.
 """
 
@@ -28,7 +28,7 @@ from ..environment import PlatformEnvironment
 
 @dataclass
 class SecureLambdaProps:
-    """The knobs a data scientist may turn. No vpc/kms/role/boundary args — those
+    """The knobs a data scientist may turn. No vpc/kms/role/boundary args - those
     come from the account baseline."""
 
     code: _lambda.Code

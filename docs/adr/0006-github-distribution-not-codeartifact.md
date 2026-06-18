@@ -1,4 +1,4 @@
-# ADR 0006 — Distribute the library via GitHub (git install), not CodeArtifact
+# ADR 0006 - Distribute the library via GitHub (git install), not CodeArtifact
 
 - Status: Accepted
 - Date: 2026-05-27

@@ -1,4 +1,4 @@
-# ADR 0007 — Uniform pipelines via a reusable GitHub Actions workflow; three accounts
+# ADR 0007 - Uniform pipelines via a reusable GitHub Actions workflow; three accounts
 
 - Status: Accepted
 - Date: 2026-05-27
@@ -15,7 +15,7 @@ updates without per-repo drift.
   in the platform repo is the single source of truth for the pipeline. Consumer
   repos contain only a **thin caller** referencing it at a pinned tag
   (`uses: michaelfecher/paved-cdk/.github/workflows/cdk-deploy.yml@v0.1.0`).
-- Stages **dev → preprod → prod** are sequential jobs, each bound to a GitHub
+- Stages **dev -> preprod -> prod** are sequential jobs, each bound to a GitHub
   **Environment** of the same name holding that account's OIDC `AWS_DEPLOY_ROLE_ARN`
   and protection rules (required reviewers on `prod`). No long-lived AWS keys.
 - The per-account paved-road config comes from the static account registry in code

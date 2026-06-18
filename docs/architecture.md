@@ -1,9 +1,9 @@
-# Architecture — Paved CDK
+# Architecture - Paved CDK
 
 > **Scope note.** This documents the fuller platform design. The committed **minimal v1**
 > is the construct library (kernel + `SecureLambda` + `SecureDataApi`) + the Copier template.
 > The reusable pipeline, the SDK/declarative variants, the service-orchestration layer,
-> prototypes and onboarding are **parked** (`_parked/`, git-ignored) for a later phase —
+> prototypes and onboarding are **parked** (`_parked/`, git-ignored) for a later phase -
 > sections describing them reflect the planned design, not the current committed core.
 
 Diagrams of the **currently built** architecture (reference PoC). Source of truth is the
@@ -11,10 +11,10 @@ code under `packages/paved_cdk/` and `template/`; the ADRs under `docs/adr/`
 record the rationale.
 
 > **Draw.io / diagrams.net:** every Mermaid diagram can be imported directly:
-> `Arrange → Insert → Advanced → Mermaid…`, then paste the code block. The diagrams stay
+> `Arrange -> Insert -> Advanced -> Mermaid...`, then paste the code block. The diagrams stay
 > editable and live next to the code.
 >
-> **HLD with real AWS icons:** `docs/diagrams/paved-cdk-hld.drawio` — open in
+> **HLD with real AWS icons:** `docs/diagrams/paved-cdk-hld.drawio` - open in
 > [app.diagrams.net](https://app.diagrams.net). Two pages (*As-Is* / *To-Be*) using the
 > official AWS 2019 shape library (real Lambda/DynamoDB/S3/SageMaker/KMS/CloudFormation
 > glyphs). Static exports for slides: `docs/diagrams/hld-as-is.png`,
@@ -35,11 +35,11 @@ record the rationale.
 > drawio -x -f png --scale 2 -o docs/diagrams/hld-to-be.png            /tmp/page-tobe.drawio  --no-sandbox
 > drawio -x -f png --scale 2 -o docs/diagrams/hld-repos-workflows.png  /tmp/page-repos.drawio --no-sandbox
 > ```
-> (Or open the `.drawio` in draw.io and `File → Export as → PNG` per page.)
+> (Or open the `.drawio` in draw.io and `File -> Export as -> PNG` per page.)
 
 ---
 
-## 1. HLD — As-Is vs To-Be
+## 1. HLD - As-Is vs To-Be
 
 The two diagrams below are meant for a side-by-side, stakeholder-facing comparison.
 
@@ -50,10 +50,10 @@ flowchart TB
   DEV([Developer]) -->|git push| REPO["GitHub repo<br/>branches: development / main / production"]
   REPO -->|triggers on push| GHA["GitHub Actions CI/CD"]
 
-  subgraph gov["Backend AWS Account — Central Governance"]
+  subgraph gov["Backend AWS Account - Central Governance"]
     CFGDB[(DynamoDB Config Table<br/>Project + Branch then Params)]
     LOGDB[(DynamoDB Log Table)]
-    ARCH[(S3 — Template Archive)]
+    ARCH[(S3 - Template Archive)]
   end
 
   subgraph steps["CDK Pipeline Steps"]
@@ -74,7 +74,7 @@ flowchart TB
   S7 -.logs deployment.-> LOGDB
   S6 -->|deploys stack| CFN["CloudFormation Stack"]
 
-  subgraph res["Resource AWS Account — Target Environment"]
+  subgraph res["Resource AWS Account - Target Environment"]
     CFN --> R["Lambda · IAM · API GW · S3 · Step Functions<br/>Aurora · SNS · ECR · VPC Endpoints"]
   end
 
@@ -86,12 +86,12 @@ flowchart TB
 
 1. **Config in DynamoDB, fetched at synth (step 3).** Non-deterministic (same commit can
    synth differently), a *second* source of truth outside Git, no PR/diff/test on config
-   changes. It also reduces CDK to a templater fed by a table — which is exactly why "why
+   changes. It also reduces CDK to a templater fed by a table - which is exactly why "why
    even use CDK?" comes up.
 2. **No validation/governance gate.** No `ruff` / `pytest` / `cdk synth` validation before deploy.
-3. **Branch-per-environment** (development/main/production → DEV/TEST/PROD) invites drift
+3. **Branch-per-environment** (development/main/production -> DEV/TEST/PROD) invites drift
    between branches and merge pain.
-4. **The platform itself is invisible** — only pipeline + config fetch are shown; the
+4. **The platform itself is invisible** - only pipeline + config fetch are shown; the
    construct library, governance and the DS-facing interface (the actual product) are not.
 
 ### 1b. To-Be (target)
@@ -101,14 +101,14 @@ flowchart TB
   DEV([Developer]) -->|"PR / push to main"| REPO["GitHub consumer repo<br/>single trunk: main"]
   REPO -->|"uses reusable workflow @tag"| RW["Reusable workflow (platform repo)"]
 
-  subgraph platform["Platform repo — single source of truth"]
+  subgraph platform["Platform repo - single source of truth"]
     LIB["Library: constructs + governance<br/>+ PlatformEnvironment"]
     REG[(AccountRegistry<br/>static in code)]
     TPL["Copier template"]
   end
 
   RW --> VAL["validate<br/>ruff + pytest + cdk synth<br/>(no AWS login)"]
-  VAL --> DEVS["deploy → dev"] --> TESTS["deploy → preprod"] --> PRODS["deploy → prod<br/>(required reviewers)"]
+  VAL --> DEVS["deploy -> dev"] --> TESTS["deploy -> preprod"] --> PRODS["deploy -> prod<br/>(required reviewers)"]
 
   REG -.resolved at synth.-> VAL
   LIB -.pinned by tag.-> REPO
@@ -118,7 +118,7 @@ flowchart TB
   TESTS -.OIDC.-> ATEST[(AWS preprod)]
   PRODS -.OIDC.-> APROD[(AWS prod)]
 
-  subgraph govt["Backend account — Governance (audit only)"]
+  subgraph govt["Backend account - Governance (audit only)"]
     ARCH[(S3 template archive)]
     LOGDB[(DynamoDB log table)]
   end
@@ -128,11 +128,11 @@ flowchart TB
   class REG,VAL good
 ```
 
-**What changes:** DynamoDB **config** table removed → static `AccountRegistry` in the repo
+**What changes:** DynamoDB **config** table removed -> static `AccountRegistry` in the repo
 (deterministic, PR-reviewed); a **validate gate** (ruff + pytest + cdk synth) runs before any
-deploy, with **no AWS login** because synth is offline; **branch-per-env → single trunk +
-stage promotion** (dev → preprod → prod via GitHub Environments); the **library + Copier
-template** are core parts. The DynamoDB **log** table and S3 **template archive** stay —
+deploy, with **no AWS login** because synth is offline; **branch-per-env -> single trunk +
+stage promotion** (dev -> preprod -> prod via GitHub Environments); the **library + Copier
+template** are core parts. The DynamoDB **log** table and S3 **template archive** stay -
 that is a legitimate audit trail.
 
 ---
@@ -146,7 +146,7 @@ account-specific values come from.
 flowchart TB
   DS([Data Scientist<br/>no IaC experience])
 
-  subgraph tpl["Template layer — Copier"]
+  subgraph tpl["Template layer - Copier"]
     COPIER[copier copy / update]
     ANS[".copier-answers.yml<br/>Owner · Team · CostCenter · platform_version"]
   end
@@ -157,7 +157,7 @@ flowchart TB
     CALLER[".github/workflows/deploy.yml<br/>thin caller of the reusable pipeline"]
   end
 
-  subgraph lib["Library layer — paved_cdk (the product)"]
+  subgraph lib["Library layer - paved_cdk (the product)"]
     PS[PlatformStack]
     ENV[PlatformEnvironment<br/>resolver]
     REG[(AccountRegistry<br/>static in code · source of truth)]
@@ -198,7 +198,7 @@ boundary, tags, compliance) is resolved by the library from the account. No `vpc
 ## 3. Deterministic config resolution (static registry)
 
 The subtlest and most important part: how the target account becomes the typed
-`PlatformConfig` — **deterministically, without AWS access** (ADR 0008).
+`PlatformConfig` - **deterministically, without AWS access** (ADR 0008).
 
 ```mermaid
 sequenceDiagram
@@ -221,7 +221,7 @@ sequenceDiagram
     end
 
     rect rgb(235,255,235)
-    Note over ENV: Built from CONCRETE strings — no AWS call:<br/>from_vpc_attributes / from_key_arn / from_security_group_id<br/>Branch on env: prod → RETAIN, else DESTROY
+    Note over ENV: Built from CONCRETE strings - no AWS call:<br/>from_vpc_attributes / from_key_arn / from_security_group_id<br/>Branch on env: prod -> RETAIN, else DESTROY
     ENV->>CFG: PlatformConfig (frozen dataclass)
     end
 
@@ -229,7 +229,7 @@ sequenceDiagram
     PS->>PS: apply_platform_governance(...)
 ```
 
-Same commit → same template. Each field of a `PlatformAccount` flows into the template via
+Same commit -> same template. Each field of a `PlatformAccount` flows into the template via
 a CDK importer, no lookup:
 
 | Field (`PlatformAccount`) | Used by | Result in the template |
@@ -238,22 +238,22 @@ a CDK importer, no lookup:
 | `execute_api_vpc_endpoint_id` | `InterfaceVpcEndpoint.from_interface_vpc_endpoint_attributes` | `IInterfaceVpcEndpoint` (private API) |
 | `kms_key_arn` | `Key.from_key_arn` | `IKey`, concrete key id |
 | `permissions_boundary_arn` | set by `PermissionsBoundaryAspect` | ARN on **every** `CfnRole` |
-| `environment` | branch in the resolver | `prod → RemovalPolicy.RETAIN`, log retention, `Environment` tag |
+| `environment` | branch in the resolver | `prod -> RemovalPolicy.RETAIN`, log retention, `Environment` tag |
 
 > The only SSM-like element in a synthesized template is CDK's own `BootstrapVersion`
-> parameter — unavoidable and unrelated to our config.
+> parameter - unavoidable and unrelated to our config.
 
 > **Account ids come from the environment.** To keep real account numbers out of the repo,
 > `account_id` is read per stage from `PAVED_CDK_{DEV,PREPROD,PROD}_ACCOUNT_ID` (placeholder
 > fallback for offline import/tests), and the KMS/boundary ARNs are *built* from the resolved
 > id. The rest of the baseline stays static. Resolution is still deterministic for a given
-> environment — the env vars are set once per deploy target, not fetched at synth.
+> environment - the env vars are set once per deploy target, not fetched at synth.
 
 ---
 
 ## 4. Governance every stack gets
 
-`apply_platform_governance(stack, cfg, tags)` — guardrails enforced in code, not by docs or
+`apply_platform_governance(stack, cfg, tags)` - guardrails enforced in code, not by docs or
 discipline (ADR 0005).
 
 ```mermaid
@@ -265,7 +265,7 @@ flowchart LR
   G --> VAL{"3 · Mandatory tags present?<br/>Owner · Team · CostCenter · Environment"}
   G --> ENC["4 · EncryptionEnforcerAspect<br/>fail-closed on missing encryption"]
 
-  VAL -- no --> ERR[["PlatformConfigError<br/>with remediation → synth fails"]]
+  VAL -- no --> ERR[["PlatformConfigError<br/>with remediation -> synth fails"]]
   VAL -- yes --> OK([continue])
 
   classDef fail fill:#fdd,stroke:#c33
@@ -274,7 +274,7 @@ flowchart LR
 
 ---
 
-## 5. Uniform pipeline — event-driven, 3 stages, platform-owned auth (ADR 0011)
+## 5. Uniform pipeline - event-driven, 3 stages, platform-owned auth (ADR 0011)
 
 One reusable workflow; the master and every consumer call it with a thin caller pinned by
 `@tag` (ADR 0007). The event decides what happens; the Data Scientist sets **nothing
@@ -283,26 +283,26 @@ AWS-specific**.
 ```mermaid
 flowchart TB
   subgraph consumer["Consumer / master repo"]
-    THIN[".github/workflows/deploy.yml<br/>uses: …/cdk-deploy.yml@tag<br/>with: stack_name (NO secrets)"]
+    THIN[".github/workflows/deploy.yml<br/>uses: .../cdk-deploy.yml@tag<br/>with: stack_name (NO secrets)"]
   end
 
-  subgraph platform["Platform repo — central source of truth"]
+  subgraph platform["Platform repo - central source of truth"]
     RW["cdk-deploy.yml (workflow_call)"]
     REG[(AccountRegistry<br/>static in code)]
-    VARS[["GitHub variables (platform-set):<br/>PAVED_CDK_*_ACCOUNT_ID<br/>→ OIDC role by convention"]]
+    VARS[["GitHub variables (platform-set):<br/>PAVED_CDK_*_ACCOUNT_ID<br/>-> OIDC role by convention"]]
   end
 
   THIN -->|"@tag"| RW
   RW --> V["validate<br/>ruff · cdk synth<br/>(no AWS login)"]
   V --> D{"Event?"}
 
-  D -- "PR (same-repo)" --> PV["preview → dev<br/>pr-N-stack (ephemeral)"]
+  D -- "PR (same-repo)" --> PV["preview -> dev<br/>pr-N-stack (ephemeral)"]
   D -- "PR closed" --> PD["destroy pr-N-stack"]
   D -- "push main" --> DEV
   D -- "push tag vX.Y.Z" --> DEV
 
   subgraph stages["release promotion (tag only)"]
-    DEV["deploy → dev"] --> PRE["deploy → preprod"] --> PROD["deploy → prod<br/>(required reviewers)"]
+    DEV["deploy -> dev"] --> PRE["deploy -> preprod"] --> PROD["deploy -> prod<br/>(required reviewers)"]
   end
 
   PV -.OIDC.-> ADEV[(AWS dev)]
@@ -320,7 +320,7 @@ flowchart TB
 **Mechanics:**
 - **dev** gets every `main` push; **preprod & prod only a release tag** `vX.Y.Z` (prod with
   Required Reviewers). A **PR** gets a live, ephemeral `pr-<n>-<slug>` preview in **dev**
-  (same-repo only), destroyed when the PR closes — the prefix comes from `STACK_PREFIX`, which
+  (same-repo only), destroyed when the PR closes - the prefix comes from `STACK_PREFIX`, which
   `PlatformStack` applies transparently.
 - **Deploy auth is platform-owned:** per-stage account ids are GitHub **variables**
   (not secrets), the OIDC role ARN is derived by convention; the same ids feed the registry so
@@ -348,14 +348,14 @@ flowchart LR
   T2 --> MERGE
   MERGE --> P1["Project @v0.2.0<br/>pipeline ref + lib pin bumped"]
 
-  note["keep app.py thin →<br/>opinion in the library, else merge conflicts"]:::n
+  note["keep app.py thin -><br/>opinion in the library, else merge conflicts"]:::n
   MERGE -.- note
   classDef n fill:#ffd,stroke:#cc3
 ```
 
 **Library distribution** (no CodeArtifact, ADR 0006): the rendered `pyproject.toml` pins the
-library directly by git tag —
-`[tool.uv.sources] paved-cdk = { git = …, tag = "v0.1.0", subdirectory = … }`.
+library directly by git tag -
+`[tool.uv.sources] paved-cdk = { git = ..., tag = "v0.1.0", subdirectory = ... }`.
 `copier update` bumps this tag in lockstep with the pipeline tag.
 
 ---
@@ -390,7 +390,7 @@ classDiagram
     +api_name
     -bucket: KMS-encrypted, no public access
     -api: PRIVATE, VPC-endpoint only
-    -prod → RETAIN
+    -prod -> RETAIN
   }
   class SecureLambda {
     <<catalog: paved_cdk.compute>>
@@ -428,30 +428,30 @@ classDiagram
 > **Catalog pattern:** constructs are an à-la-carte catalog (namespaced
 > `paved_cdk.storage` / `paved_cdk.compute`). A consumer instantiates only what it needs;
 > importing the library deploys nothing (*instantiation ≠ deployment*). `SecureLambda` shows
-> the "secure envelope vs filling" split — the library wraps the resource securely, the
+> the "secure envelope vs filling" split - the library wraps the resource securely, the
 > workload supplies the code via `Code.from_asset(...)`. See [building-blocks](building-blocks.md).
 
 ---
 
-## 8. C4 — Container diagram (static account registry, GitOps)
+## 8. C4 - Container diagram (static account registry, GitOps)
 
 The current architecture: GitHub as source of truth, static registry, deterministic.
 
 ```mermaid
 C4Container
-    title Container diagram — Paved CDK
+    title Container diagram - Paved CDK
 
     Person(ds, "Data Scientist", "No/no desired IaC experience")
     Person(pe, "Platform Engineer", "Maintains library, template, registry")
 
-    Enterprise_Boundary(gh, "GitHub — source of truth") {
+    Enterprise_Boundary(gh, "GitHub - source of truth") {
         System_Boundary(plat, "Platform repo") {
             Container(lib, "Library paved_cdk", "Python / aws-cdk-lib", "PlatformStack, constructs, resolver, governance")
             ContainerDb(reg, "AccountRegistry", "Python classes in code", "All accounts + baseline; deterministic, PR-reviewed")
             Container(tpl, "Copier template", "Jinja", "Scaffolds consumer projects")
             Container(pipe, "Reusable pipeline", "GitHub Actions", "validate then dev then preprod then prod")
         }
-        System_Boundary(cons, "Consumer repo — per DS project") {
+        System_Boundary(cons, "Consumer repo - per DS project") {
             Container(app, "CDK app", "Python", "app.py ~10 lines + .copier-answers")
         }
     }
@@ -470,15 +470,15 @@ C4Container
 ```
 
 > Note: `AccountRegistry` is drawn as a separate "ContainerDb" to stress its role as the
-> *data source* — technically it is a module **inside** the library.
+> *data source* - technically it is a module **inside** the library.
 
-## 9. C4 — Component diagram (inside the library)
+## 9. C4 - Component diagram (inside the library)
 
-How resolution is wired internally — the single seam `PlatformEnvironment`.
+How resolution is wired internally - the single seam `PlatformEnvironment`.
 
 ```mermaid
 C4Component
-    title Component diagram — Library paved_cdk
+    title Component diagram - Library paved_cdk
 
     Person(ds, "Data Scientist", "Writes ~10 lines")
 
@@ -509,22 +509,22 @@ C4Component
 
 ## Known sharp edges (carry these honestly into the presentation)
 
-- **Default-VPC PoC baseline** — the example registry is verified offline (8 tests green)
+- **Default-VPC PoC baseline** - the example registry is verified offline (13 tests green)
   and was deployed end-to-end into a `dev` account (private API + KMS bucket + boundary +
   tags confirmed on real infra). The baseline is wired to the account's **default VPC**;
   a real deployment uses dedicated private subnets. Account ids are read from environment
   variables (`PAVED_CDK_{DEV,PREPROD,PROD}_ACCOUNT_ID`), with placeholders as fallback.
-- **The registry must stay in sync with reality** — baseline values now live in code, not
+- **The registry must stay in sync with reality** - baseline values now live in code, not
   live in SSM. If the LZ rotates a subnet/KMS, a PR must update the registry, and consumers
   pick it up only via `copier update` (pull, not automatic). Mitigation: generate the
   registry from AWS Organizations in CI + a freshness gate in the pipeline that flags stale
   pins.
-- **VPC endpoints are a prerequisite** — a notebook with `internet=Disabled` is only usable
+- **VPC endpoints are a prerequisite** - a notebook with `internet=Disabled` is only usable
   with interface endpoints (`sagemaker.api/.runtime/.notebook`), an S3 gateway, and egress
   rules to the package source. Otherwise: creatable but no `pip`/`uv install`.
-- **`copier update` not yet exercised** — the real USP over Cookiecutter is unproven until a
-  v1→v2 merge is tested.
-- **SageMaker notebook instances are effectively legacy** — fine as a wiring demo; SageMaker
+- **`copier update` not yet exercised** - the real USP over Cookiecutter is unproven until a
+  v1->v2 merge is tested.
+- **SageMaker notebook instances are effectively legacy** - fine as a wiring demo; SageMaker
   Studio would be the more realistic paved road.
 ```
 

@@ -21,7 +21,7 @@ def test_resolve_reads_baseline_from_registry(app):
     assert cfg.account == "111111111111"
     assert cfg.environment == "dev"
     assert cfg.is_production is False
-    # Values come straight from the registry — no SSM, no lookup.
+    # Values come straight from the registry - no SSM, no lookup.
     assert cfg.private_subnet_ids == [
         "subnet-0c170a7b7245d3384",
         "subnet-0aaff7625fecf62a0",

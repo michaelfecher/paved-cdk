@@ -1,4 +1,4 @@
-"""paved-cdk — paved-road AWS CDK constructs for Data Scientists."""
+"""paved-cdk - paved-road AWS CDK constructs for Data Scientists."""
 
 from .account import PlatformAccount
 from .compute import SecureLambda, SecureLambdaProps

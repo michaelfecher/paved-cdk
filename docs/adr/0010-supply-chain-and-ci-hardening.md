@@ -1,4 +1,4 @@
-# ADR 0010 — Supply-chain & CI hardening
+# ADR 0010 - Supply-chain & CI hardening
 
 - Status: Accepted
 - Date: 2026-06-16
@@ -28,9 +28,9 @@ privilege escalation. These are decisions worth recording, not just patches.
 - **Least-privilege secrets.** The caller passes only `AWS_DEPLOY_ROLE_ARN`, declared
   explicitly in the reusable workflow's `workflow_call.secrets`. **(Superseded by ADR 0011:**
   the multi-account model needs per-stage values, so deploy auth moved to platform-set GitHub
-  **variables** — there is no per-repo deploy secret anymore.)
+  **variables** - there is no per-repo deploy secret anymore.)
 - **No GitHub-expression injection.** Values flow into `github-script` via `env:`, read as
-  `process.env.*` — never interpolated into the script body.
+  `process.env.*` - never interpolated into the script body.
 - **Escalation-proof permissions boundary.** The boundary denies creating/altering IAM
   principals without the same boundary, and protects itself (deny edits to its own policy).
 
@@ -38,7 +38,7 @@ privilege escalation. These are decisions worth recording, not just patches.
 
 - The pipeline is safe to run on a public repo; PR diffs do not leak account ids.
 - Builds resist mutable-tag tampering on third-party actions.
-- Stricter boundary means roles created by a bounded principal must themselves be bounded —
+- Stricter boundary means roles created by a bounded principal must themselves be bounded -
   intended; document it when teams create their own roles.
 
 ## Notes
