@@ -2,14 +2,14 @@
 
 A paved-road AWS CDK platform for Data Scientists: an opinionated, account-aware
 construct library (`packages/paved_cdk`) plus a Copier project template
-(`template/`). Data Scientists write ~10 lines and get a secure, governed stack —
+(`template/`). Data Scientists write ~10 lines and get a secure, governed stack -
 no VPC, env, KMS, IAM or tagging decisions.
 
 See [`CONTEXT.md`](CONTEXT.md) for the domain language and [`docs/adr/`](docs/adr/)
 for decisions.
 
-> **Scope — minimal v1.** The committed core is the construct library
-> (kernel + `SecureLambda` + `SecureDataApi`) plus the Copier template — i.e. what a
+> **Scope - minimal v1.** The committed core is the construct library
+> (kernel + `SecureLambda` + `SecureDataApi`) plus the Copier template - i.e. what a
 > consumer actually deploys. The reusable **pipeline**, the **SDK/declarative variants**,
 > the **service-orchestration layer**, the **prototypes** and the **onboarding** automation
 > are **parked** in a local, git-ignored `_parked/` folder for a later phase. Some docs and
@@ -23,9 +23,9 @@ template/                      # Copier template that scaffolds consumer project
 docs/adr/                      # architecture decision records
 ```
 
-## Tooling — what actually needs Node
+## Tooling - what actually needs Node
 
-The Python library and `app.synth()` are **pure Python — no Node.js**. Only the AWS
+The Python library and `app.synth()` are **pure Python - no Node.js**. Only the AWS
 **CDK CLI** (`cdk deploy` / `bootstrap` / `diff`) is a Node app. So:
 
 | Task | Tool | Node? |
@@ -34,7 +34,7 @@ The Python library and `app.synth()` are **pure Python — no Node.js**. Only th
 | `cdk synth` / validate / `pytest` | Python (`uv run python app.py`) | **No** |
 | `cdk deploy` / `bootstrap` / `diff` | CDK CLI | **Yes** |
 
-A data scientist therefore needs only **Python + uv** locally — authoring, synth and
+A data scientist therefore needs only **Python + uv** locally - authoring, synth and
 tests are Node-free. Deploys run in the **CI pipeline** (which installs Node centrally),
 so nobody installs Node by hand. Local `make deploy` is the one exception that needs the
 CDK CLI (Node) on the machine. See [ADR 0001](docs/adr/0001-pure-python-cdk-no-jsii.md).
@@ -68,7 +68,7 @@ app.synth()
 
 ## AWS account ids
 
-Account ids are **not** hard-coded — the registry reads them from environment
+Account ids are **not** hard-coded - the registry reads them from environment
 variables, with placeholder fallbacks so everything synthesizes and tests offline:
 
 ```bash

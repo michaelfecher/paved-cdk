@@ -6,16 +6,16 @@ Generated from the Paved CDK template.
 
 ```bash
 uv sync          # pulls the platform library straight from GitHub (pinned tag)
-uv run cdk synth # builds the template — deterministic, no AWS login needed
+uv run cdk synth # builds the template - deterministic, no AWS login needed
 ```
 
 The platform library is declared as a git dependency in `pyproject.toml` (no extra
 package registry needed). `uv sync` clones it at tag `{{ platform_version }}`.
 
-## Deployment — three stages, one pipeline
+## Deployment - three stages, one pipeline
 
 Pushing to `main` runs the **central, shared pipeline** (maintained in
-`{{ platform_repo }}`): lint → synth → deploy **dev → preprod → prod**.
+`{{ platform_repo }}`): lint -> synth -> deploy **dev -> preprod -> prod**.
 Every DS project runs the exact same pipeline; it updates when you `copier update`
 (which bumps the `@{{ platform_version }}` ref in `.github/workflows/deploy.yml`).
 

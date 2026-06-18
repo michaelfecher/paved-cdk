@@ -2,7 +2,7 @@
 
 This is the heart of the platform: given any CDK scope, it looks the stack's
 target account up in the :class:`AccountRegistry` (static config in code) and
-builds a typed :class:`PlatformConfig` — so consumer code never passes ``vpc=`` /
+builds a typed :class:`PlatformConfig` - so consumer code never passes ``vpc=`` /
 ``env=`` / ``kms=``.
 
 All values come from concrete strings in the registry, fed into the CDK
@@ -56,7 +56,7 @@ class PlatformEnvironment:
 
         account = registry.resolve(stack.account)
 
-        # All importers below take concrete strings — no AWS lookup, fully
+        # All importers below take concrete strings - no AWS lookup, fully
         # deterministic at synth.
         vpc = ec2.Vpc.from_vpc_attributes(
             scope,

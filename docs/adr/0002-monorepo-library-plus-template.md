@@ -1,4 +1,4 @@
-# ADR 0002 — Monorepo: library + template together
+# ADR 0002 - Monorepo: library + template together
 
 - Status: Accepted
 - Date: 2026-05-27

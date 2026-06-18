@@ -1,4 +1,4 @@
-# ADR 0004 — Synth-time vs deploy-time resolution of SSM values
+# ADR 0004 - Synth-time vs deploy-time resolution of SSM values
 
 - Status: **Superseded by ADR 0008** (static account registry in code)
 - Date: 2026-05-27
@@ -13,9 +13,9 @@
 
 SSM values can be resolved two ways in CDK:
 
-- `StringParameter.value_from_lookup` — **synth time**; concrete string baked into
+- `StringParameter.value_from_lookup` - **synth time**; concrete string baked into
   the template; cached in `cdk.context.json`; needs AWS read access at synth.
-- `StringParameter.value_for_string_parameter` — **deploy time**; a CFN dynamic
+- `StringParameter.value_for_string_parameter` - **deploy time**; a CFN dynamic
   reference (token); resolved by CloudFormation at deploy; no synth-time AWS access.
 
 A token cannot be branched on (`if is_production`), split (`","`), or fed to APIs
@@ -33,7 +33,7 @@ Resolve **per parameter**:
 ## Consequences
 
 - Deploy-time resolution keeps ARNs always-fresh and **avoids the first-pass
-  "dummy-value-for-…" string breaking `Key.from_key_arn` ARN parsing**.
+  "dummy-value-for-..." string breaking `Key.from_key_arn` ARN parsing**.
 - Synth-time values require consumers to **commit `cdk.context.json`** (a lockfile)
   and to run `cdk context --clear` after a Landing-Zone change, or stale ids pin
   silently.

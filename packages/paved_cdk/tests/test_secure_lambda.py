@@ -1,4 +1,4 @@
-"""SecureLambda: in-VPC, KMS-encrypted env, account log retention — all wired from
+"""SecureLambda: in-VPC, KMS-encrypted env, account log retention - all wired from
 the baseline, with only code/handler supplied by the consumer."""
 
 from __future__ import annotations

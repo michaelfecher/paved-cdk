@@ -1,7 +1,7 @@
 [project]
 name = "paved-cdk"
 version = "0.1.0"
-description = "Paved CDK — paved-road AWS CDK construct library; secure, account-aware constructs for Data Scientists with no IaC background."
+description = "Paved CDK - paved-road AWS CDK construct library; secure, account-aware constructs for Data Scientists with no IaC background."
 requires-python = ">=3.11"
 authors = [{ name = "Paved CDK Team" }]
 readme = "README.md"

@@ -1,4 +1,4 @@
-"""Compute catalog — paved-road compute bricks."""
+"""Compute catalog - paved-road compute bricks."""
 
 from .secure_lambda import SecureLambda, SecureLambdaProps
 

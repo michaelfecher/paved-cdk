@@ -65,7 +65,7 @@ def _discover_notebooks() -> list[NotebookSpec]:
 def load(path: str = "service.yaml") -> ServiceSpec:
     """Read a manifest (relative to cwd) and return a :class:`ServiceSpec`.
 
-    The manifest's ``service_id`` and ``owner`` are not part of the ServiceSpec —
+    The manifest's ``service_id`` and ``owner`` are not part of the ServiceSpec -
     they steer the stack id / governance tags and are read by :mod:`.synth`.
     """
     with open(path, encoding="utf-8") as fh:

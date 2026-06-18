@@ -1,4 +1,4 @@
-"""``paved-cdk-synth`` console script — synth a declarative consumer with no Python.
+"""``paved-cdk-synth`` console script - synth a declarative consumer with no Python.
 
 A declarative consumer's ``cdk.json`` is just ``{"app": "paved-cdk-synth"}``. The CDK
 CLI runs this entry point in the consumer's directory; we load ``service.yaml``, derive

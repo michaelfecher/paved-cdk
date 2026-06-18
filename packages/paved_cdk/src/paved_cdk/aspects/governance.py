@@ -1,4 +1,4 @@
-"""Platform governance applied to every PlatformStack — guardrails the Data
+"""Platform governance applied to every PlatformStack - guardrails the Data
 Scientist gets for free."""
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ def apply_platform_governance(
         raise PlatformConfigError(
             f"Stack '{stack.stack_name}' is missing required governance tags: {missing}. "
             f"The Copier template injects Owner/Team/CostCenter into app.py from your "
-            f"answers — re-run `copier copy` / `copier update`, or pass them via "
+            f"answers - re-run `copier copy` / `copier update`, or pass them via "
             f"PlatformStack(..., tags={{...}})."
         )
 

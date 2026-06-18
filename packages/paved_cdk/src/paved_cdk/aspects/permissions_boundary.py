@@ -3,7 +3,7 @@
 aws-cdk-lib's ``PermissionsBoundary`` value object is normally attached at Stage
 construction, before the platform config is resolved. An Aspect setting
 ``permissionsBoundary`` on every ``CfnRole`` is applied after the stack is built and
-uniformly covers *every* role — including those created inside vendor constructs —
+uniformly covers *every* role - including those created inside vendor constructs -
 without each construct having to wire it.
 """
 
