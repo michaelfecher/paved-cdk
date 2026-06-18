@@ -1,5 +1,10 @@
 # CONTEXT — Paved CDK
 
+> **Scope — minimal v1.** Committed core = construct library (kernel + `SecureLambda` +
+> `SecureDataApi`) + Copier template. Pipeline, SDK/declarative frontends,
+> service-orchestration, prototypes and onboarding are parked in `_parked/` (git-ignored)
+> for a later phase.
+
 ## Why this exists
 
 Data Scientists have little/no Infrastructure-as-Code experience and do
