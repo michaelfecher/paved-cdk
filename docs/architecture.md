@@ -2,7 +2,7 @@
 
 > **Scope note.** This documents the fuller platform design. The committed **minimal v1**
 > is the construct library (kernel + `SecureLambda` + `SecureDataApi`) + the Copier template.
-> The reusable pipeline, the SDK/declarative frontends, the service-orchestration layer,
+> The reusable pipeline, the SDK/declarative variants, the service-orchestration layer,
 > prototypes and onboarding are **parked** (`_parked/`, git-ignored) for a later phase —
 > sections describing them reflect the planned design, not the current committed core.
 

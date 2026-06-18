@@ -336,6 +336,7 @@ source = { editable = "packages/paved_cdk" }
 dependencies = [
     { name = "aws-cdk-lib" },
     { name = "constructs" },
+    { name = "pyyaml" },
 ]
 
 [package.optional-dependencies]
@@ -349,6 +350,7 @@ requires-dist = [
     { name = "aws-cdk-lib", specifier = ">=2.150.0,<3.0.0" },
     { name = "constructs", specifier = ">=10.0.0,<11.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
+    { name = "pyyaml", specifier = ">=6" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
 ]
 provides-extras = ["dev"]

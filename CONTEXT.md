@@ -1,7 +1,7 @@
 # CONTEXT — Paved CDK
 
 > **Scope — minimal v1.** Committed core = construct library (kernel + `SecureLambda` +
-> `SecureDataApi`) + Copier template. Pipeline, SDK/declarative frontends,
+> `SecureDataApi`) + Copier template. Pipeline, SDK/declarative variants,
 > service-orchestration, prototypes and onboarding are parked in `_parked/` (git-ignored)
 > for a later phase.
 
