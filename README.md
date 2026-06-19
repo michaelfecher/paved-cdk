@@ -77,11 +77,13 @@ cp env.example .env            # then fill in your real account ids
 export $(grep -v '^#' .env | xargs)
 ```
 
-| Stage   | Env var                        |
-|---------|--------------------------------|
-| dev     | `PAVED_CDK_DEV_ACCOUNT_ID`     |
-| preprod | `PAVED_CDK_PREPROD_ACCOUNT_ID` |
-| prod    | `PAVED_CDK_PROD_ACCOUNT_ID`    |
+Account ids are per team and stage: `PAVED_CDK_<TEAM>_<STAGE>_ACCOUNT_ID`.
+
+| Team | Stage   | Env var                              |
+|------|---------|--------------------------------------|
+| ds   | dev     | `PAVED_CDK_DS_DEV_ACCOUNT_ID`         |
+| ds   | preprod | `PAVED_CDK_DS_PREPROD_ACCOUNT_ID`     |
+| ds   | prod    | `PAVED_CDK_DS_PROD_ACCOUNT_ID`        |
 
 The rest of each account's baseline (VPC, subnets, KMS key, permissions boundary,
 execute-api endpoint) is static config in [`registry.py`](packages/paved_cdk/src/paved_cdk/registry.py).

@@ -140,9 +140,9 @@ app.synth()
 cd "$DEMO/consumer-b-ingest"
 PAVED_CDK_STAGE=dev CDK_OUTDIR=cdk.out \
   uv run --project "$PLATFORM" python app.py
-# shape: 1 S3 bucket, 1 RestApi, 2 Lambda functions
+# shape: 1 S3 bucket, 1 RestApi, 2 Lambda functions; stack name dev-ingest-service
 # grep the template: it resolves marketing's VPC (vpc-0a11...), not ds's (vpc-0c86...)
-grep -o 'vpc-[0-9a-f]*' cdk.out/ingest-service.template.json | sort -u
+grep -o 'vpc-[0-9a-f]*' cdk.out/dev-ingest-service.template.json | sort -u
 ```
 
 ## What this proves
