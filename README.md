@@ -52,7 +52,7 @@ uv run copier copy . /tmp/demo \          # scaffold a sample consumer project (
 ```
 
 A consumer team scaffolds from the **git tag** instead:
-`copier copy --vcs-ref v0.1.0 gh:michaelfecher/paved-cdk my-project`.
+`copier copy --vcs-ref v0.1.0 gh:your-org/paved-cdk my-project`.
 
 ## Consumer (Data Scientist) experience
 
