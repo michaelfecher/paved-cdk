@@ -37,6 +37,11 @@ needs credentials/network (no offline synth), and has no review or diff.
 Resolution is an in-memory dict access; the downstream `from_*Attributes` importers bake
 ids into the template as literals (no AWS call). See `docs/configuration.md`.
 
+**Stack naming.** Stack names follow `$stage-$stackPrefix-$project` (amends ADR 0011's raw
+`pr-<n>-` prepend): `$stage` from config (the deploy stage), `$stackPrefix` optional (e.g.
+`pr123` for PR previews), `$project` the consumer slug; empty parts are dropped. Built in
+`PlatformStack.__init__` before `super().__init__`. Examples: `dev-scoring`, `dev-pr123-scoring`.
+
 ## Consequences
 
 - Onboarding a team is one PR (three `_account(...)` rows + three repo variables); CI

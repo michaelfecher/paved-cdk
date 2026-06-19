@@ -46,18 +46,20 @@ dev/preprod/prod).
 Each block lists **What · How it's built · Where · Why**.
 
 ### AccountRegistry - the source of truth
-- **What:** the single, in-code registry of every managed AWS account and its baseline.
+- **What:** the single, in-code registry of every managed AWS account and its baseline,
+  **grouped by team** (each team has three accounts: dev/preprod/prod).
 - **How it's built:** a module holding a tuple `_ACCOUNTS` of `PlatformAccount` instances.
-  `AccountRegistry` indexes them by `account_id` into a dict (rejecting duplicates) and
-  exposes `resolve(account_id)`, which returns the `PlatformAccount` or raises a
-  `PlatformConfigError` naming the remediation ("onboard via pull request"). A module-level
-  `DEFAULT_REGISTRY` is what production resolves against. **Onboarding an account = a pull
-  request adding one `PlatformAccount` entry**, validated by CI (schema + a deterministic
-  `cdk synth`) before merge.
-  **Account ids** are not committed: each stage reads its id from an env var
-  (`PAVED_CDK_{DEV,PREPROD,PROD}_ACCOUNT_ID`) with an offline placeholder fallback, and the
-  KMS/boundary ARNs are derived from the resolved id - so no real account number lives in the
-  repo. The rest of the baseline (VPC, subnets, KMS key id, endpoint) is static.
+  `AccountRegistry` indexes them by `account_id` and exposes `resolve(account_id)` plus the
+  team-oriented `account_for(team, stage)`, `accounts_for_team(team)` and `teams`. Unknown
+  team/account raises a `PlatformConfigError` naming the remediation ("onboard via pull
+  request"). A module-level `DEFAULT_REGISTRY` is what production resolves against.
+  **Onboarding a team = a pull request adding its three `PlatformAccount` entries**, validated
+  by CI (schema + a deterministic `cdk synth`) before merge.
+  **Account ids** are not committed: each account reads its id from a per-team/stage variable
+  `PAVED_CDK_<TEAM>_<STAGE>_ACCOUNT_ID` (e.g. `PAVED_CDK_DS_DEV_ACCOUNT_ID`) with an offline
+  placeholder fallback, and the KMS/boundary ARNs are derived from the resolved id - so no real
+  account number lives in the repo. The rest of the baseline (VPC, subnets, KMS key id,
+  endpoint) is static. See [`configuration.md`](configuration.md) (ADR 0012).
 - **Where:** `packages/paved_cdk/src/paved_cdk/registry.py`
 - **Why:** deterministic, version-controlled, PR-reviewable; replaces the SSM/DynamoDB
   lookup (ADR 0008). GitHub stays the single source of truth.
@@ -99,11 +101,13 @@ Each block lists **What · How it's built · Where · Why**.
 
 ### PlatformStack - the base stack (delivery vehicle for the baseline)
 - **What:** the stack a Data Scientist instantiates; inheriting it delivers the whole baseline.
-- **How it's built:** subclass of `cdk.Stack`. `__init__` wires `env` from
-  `CDK_DEFAULT_ACCOUNT/REGION` (or an explicit `env`), applies the caller's governance tags,
-  resolves `self.platform_config` once via `PlatformEnvironment.resolve`, then calls
-  `apply_platform_governance(self, cfg, tags)`. Constructs reuse the cached config via
-  `PlatformEnvironment.of`.
+- **How it's built:** subclass of `cdk.Stack`. `__init__` resolves `env` from `team=` (the
+  registry's account for that team + `PAVED_CDK_STAGE`) or an explicit `env` /
+  `CDK_DEFAULT_ACCOUNT` fallback; with `team=` the team becomes the authoritative `Team` tag.
+  The stack name follows `$stage-$stackPrefix-$project` (optional `STACK_PREFIX` for PR
+  previews). It applies the caller's governance tags, resolves `self.platform_config` once via
+  `PlatformEnvironment.resolve`, then calls `apply_platform_governance(self, cfg, tags)`.
+  Constructs reuse the cached config via `PlatformEnvironment.of`.
 - **Where:** `stacks/platform_stack.py`
 - **Why:** the DS gets environment wiring + governance + resolved config by writing one line.
 
@@ -175,13 +179,14 @@ Each block lists **What · How it's built · Where · Why**.
 - **What:** the single shared CI/CD pipeline both the master and every consumer run.
 - **How it's built:** `.github/workflows/cdk-deploy.yml` (`workflow_call`), `if:`-gated by
   event - **validate** (ruff + `cdk synth`, **no AWS login**) always; then:
-  - **PR (same-repo)** -> **preview**: deploy an ephemeral `pr-<n>-<slug>` stack to **dev**
-    (`STACK_PREFIX`), comment on the PR; **PR closed** -> `cdk destroy` it.
-  - **push `main`** -> **deploy-dev** (`<slug>`).
+  - **PR (same-repo)** -> **preview**: deploy an ephemeral stack to **dev** named
+    `dev-$stackPrefix-$project` (`STACK_PREFIX`, e.g. `pr123`), comment on the PR; **PR closed**
+    -> `cdk destroy` it.
+  - **push `main`** -> **deploy-dev** (`dev-$project`).
   - **push tag `vX.Y.Z`** -> **deploy-dev -> deploy-preprod -> deploy-prod**; preprod & prod are
     reachable **only via a release tag**, prod with Required Reviewers.
-  - **Deploy auth is platform-owned (no DS input, no per-repo secret):** per-stage account ids
-    are GitHub **variables** (`PAVED_CDK_{DEV,PREPROD,PROD}_ACCOUNT_ID`); the OIDC role ARN is
+  - **Deploy auth is platform-owned (no DS input, no per-repo secret):** per-team/stage account
+    ids are GitHub **variables** (`PAVED_CDK_<TEAM>_<STAGE>_ACCOUNT_ID`); the OIDC role ARN is
     derived by convention (`...:role/paved-cdk-github-deploy`); those vars also feed the registry
     for synth. Actions are SHA-pinned and PR jobs fork-gated (ADR 0010).
 - **Where:** `.github/workflows/cdk-deploy.yml`
