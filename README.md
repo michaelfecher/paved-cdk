@@ -8,12 +8,14 @@ no VPC, env, KMS, IAM or tagging decisions.
 See [`CONTEXT.md`](CONTEXT.md) for the domain language and [`docs/adr/`](docs/adr/)
 for decisions.
 
-> **Scope - minimal v1.** The committed core is the construct library
+> **Scope - minimal v1.** The committed core on `main` is the construct library
 > (kernel + `SecureLambda` + `SecureDataApi`) plus the Copier template - i.e. what a
-> consumer actually deploys. The reusable **pipeline**, the **SDK/declarative variants**,
-> the **service-orchestration layer**, the **prototypes** and the **onboarding** automation
-> are **parked** in a local, git-ignored `_parked/` folder for a later phase. Some docs and
-> diagrams below still describe that fuller design.
+> consumer actually deploys via the **explicit / Copier** variant. The two other
+> consumption variants under evaluation live on branches `feat/sdk` and
+> `feat/declarative`; see [`docs/demo/variants.md`](docs/demo/variants.md) for the
+> side-by-side and per-variant playbooks. The reusable **pipeline**, the **prototypes**
+> and the **onboarding** automation are **parked** in a local, git-ignored `_parked/`
+> folder. Some docs and diagrams below still describe that fuller design.
 
 ## Layout
 
