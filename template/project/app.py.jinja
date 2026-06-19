@@ -1,8 +1,9 @@
 """{{ project_name }} - generated from the Paved CDK template.
 
-You only declare WHAT you want. The platform resolves VPC, subnets, KMS, the IAM
-permissions boundary, tags and governance automatically from the target account.
-Add more platform constructs below; do not add vpc/env/kms arguments.
+You only declare WHAT you want. Naming your `team` selects your three AWS accounts
+(dev/preprod/prod) and resolves VPC, subnets, KMS, the IAM permissions boundary and
+governance from the account for the deploy stage. Add more platform constructs below;
+do not add vpc/env/kms/account arguments.
 """
 
 import aws_cdk as cdk
@@ -14,9 +15,9 @@ app = cdk.App()
 stack = PlatformStack(
     app,
     "{{ project_slug }}",
+    team="{{ team }}",  # selects the account baseline (VPC/KMS/...) per stage
     tags={
         "Owner": "{{ owner_email }}",
-        "Team": "{{ team }}",
         "CostCenter": "{{ cost_center }}",
     },
 )
