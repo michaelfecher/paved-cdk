@@ -3,6 +3,8 @@
 - Status: Accepted
 - Date: 2026-06-16
 - Amends: ADR 0007 (uniform pipeline), ADR 0010 (the explicit-secret caller is superseded)
+- Amended by: ADR 0012 - stack names are now `$stage-$stackPrefix-$project` (not a raw
+  `pr-<n>-` prepend), and account-id variables are per team: `PAVED_CDK_<TEAM>_<STAGE>_ACCOUNT_ID`.
 
 ## Context
 
@@ -15,12 +17,12 @@ platform's job, not the DS's.
 ## Decision
 
 ### Trigger model (one reusable workflow, `if:`-gated by event)
-| Event | Action | Stage/account | Stack name |
+| Event | Action | Stage/account | Stack name (ADR 0012) |
 |---|---|---|---|
-| `pull_request` (open/sync, **same-repo only**) | deploy ephemeral preview | **dev** | `pr-<n>-<slug>` |
-| `pull_request` closed/merged | `cdk destroy` the preview | dev | `pr-<n>-<slug>` |
-| `push` to `main` | deploy | dev | `<slug>` |
-| `push` tag `vX.Y.Z` | promote dev -> preprod -> prod | all three | `<slug>` |
+| `pull_request` (open/sync, **same-repo only**) | deploy ephemeral preview | **dev** | `dev-pr<n>-<project>` |
+| `pull_request` closed/merged | `cdk destroy` the preview | dev | `dev-pr<n>-<project>` |
+| `push` to `main` | deploy | dev | `dev-<project>` |
+| `push` tag `vX.Y.Z` | promote dev -> preprod -> prod | all three | `<stage>-<project>` |
 
 - **preprod & prod are reachable only by a release tag** - never by an arbitrary
   push or PR. `prod` carries Required Reviewers (GitHub Environment).
@@ -28,15 +30,16 @@ platform's job, not the DS's.
   during synth/deploy, so the blast radius is dev, and the job is gated to
   same-repo PRs (forks get no credentials - ADR 0010).
 
-### Stack prefix (DS-transparent)
-`PlatformStack` reads `STACK_PREFIX` (set by the pipeline to `pr-<n>-`) and prepends
-it to the stack id. The DS writes `PlatformStack(app, "my-stack")` and never sees
-the prefix; previews get isolated names; deploys use `cdk deploy --all` /
+### Stack naming (DS-transparent) - see ADR 0012
+Stack names follow `$stage-$stackPrefix-$project`. `PlatformStack` reads the optional
+`STACK_PREFIX` (set by the pipeline to e.g. `pr123` for a PR preview) and places it between
+stage and project; empty parts are dropped. The DS writes `PlatformStack(app, "my-stack")`
+and never sees stage or prefix; previews get isolated names; deploys use `cdk deploy --all` /
 `cdk destroy --all` so prefixed and plain stacks are handled uniformly.
 
 ### Platform-owned deploy auth - the DS sets nothing
-- The platform team provisions, **once per stage** (GitHub **variables**, repo or
-  org level - ARNs/ids are not secrets): `PAVED_CDK_{DEV,PREPROD,PROD}_ACCOUNT_ID`.
+- The platform team provisions, **once per team/stage** (GitHub **variables**, repo or
+  org level - ARNs/ids are not secrets): `PAVED_CDK_<TEAM>_<STAGE>_ACCOUNT_ID`.
 - The deploy **role ARN is derived** by convention:
   `arn:aws:iam::<account-id>:role/paved-cdk-github-deploy` (name overridable via the
   `deploy_role_name` input). No per-repo secret, no `secrets: inherit`.

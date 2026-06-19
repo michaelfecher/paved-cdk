@@ -26,12 +26,16 @@ secure, compliant stack writing ~10 lines and **zero** infrastructure decisions.
   result. This is the single **seam**: constructs only ever see `PlatformConfig`,
   never the config source.
 - **AccountRegistry** - the static, in-code source of truth for every managed
-  account. `PlatformAccount` (frozen dataclass) holds one account's baseline (VPC,
-  subnets, AZs, KMS, security group, permissions boundary, environment);
-  `AccountRegistry.resolve(account_id)` returns it. Replaces the former SSM
-  contract (ADR 0008): values live in git, deterministic, PR-reviewed.
-- **PlatformStack** - base stack that wires `env` from `CDK_DEFAULT_*` and applies
-  governance automatically.
+  account, **grouped by team** (each team has dev/preprod/prod). `PlatformAccount`
+  (frozen dataclass) holds one account's baseline (VPC, subnets, AZs, KMS, permissions
+  boundary, environment, team); `resolve(account_id)` and `account_for(team, stage)`
+  return it. Replaces the former SSM/DynamoDB contract (ADR 0008, 0012): values live
+  in git, deterministic, PR-reviewed.
+- **Team** - a consumer names its `team`; the platform resolves that team's account
+  (and VPC/KMS baseline) for the deploy stage. Consumers never name a VPC or account.
+- **PlatformStack** - base stack; resolves `env` from `team=` (registry account for
+  the stage) or explicit `env`/`CDK_DEFAULT_*`, names the stack
+  `$stage-$stackPrefix-$project`, and applies governance automatically.
 - **Governance** - permissions boundary, mandatory tags and fail-closed encryption,
   applied by `apply_platform_governance` without DS involvement. (cdk-nag removed for now.)
 - **Deterministic resolution** - baseline values are concrete strings fed to the CDK

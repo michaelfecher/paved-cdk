@@ -85,7 +85,8 @@ registry *is* the contract that the SSM paths used to be.
 ## Amendment (2026-06-16) - account ids from the environment
 
 To keep real AWS account numbers out of a public repo, `account_id` is no longer a literal
-in the registry: each stage reads it from `PAVED_CDK_{DEV,PREPROD,PROD}_ACCOUNT_ID` with an
+in the registry: each account reads it from a per-team/stage variable
+`PAVED_CDK_<TEAM>_<STAGE>_ACCOUNT_ID` (e.g. `PAVED_CDK_DS_DEV_ACCOUNT_ID`) with an
 illustrative placeholder fallback (so import / `cdk synth` / tests still work offline). The
 KMS and permissions-boundary ARNs are **derived** from the resolved id; the rest of the
 baseline stays static literals. Determinism is unchanged - the env vars are set once per

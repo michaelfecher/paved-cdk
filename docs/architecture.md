@@ -244,10 +244,18 @@ a CDK importer, no lookup:
 > parameter - unavoidable and unrelated to our config.
 
 > **Account ids come from the environment.** To keep real account numbers out of the repo,
-> `account_id` is read per stage from `PAVED_CDK_{DEV,PREPROD,PROD}_ACCOUNT_ID` (placeholder
-> fallback for offline import/tests), and the KMS/boundary ARNs are *built* from the resolved
-> id. The rest of the baseline stays static. Resolution is still deterministic for a given
-> environment - the env vars are set once per deploy target, not fetched at synth.
+> `account_id` is read per team and stage from `PAVED_CDK_<TEAM>_<STAGE>_ACCOUNT_ID` (e.g.
+> `PAVED_CDK_DS_DEV_ACCOUNT_ID`; placeholder fallback for offline import/tests), and the
+> KMS/boundary ARNs are *built* from the resolved id. The rest of the baseline stays static.
+> Resolution is still deterministic - the env vars are set once per deploy target, not fetched
+> at synth.
+
+> **Team-driven selection.** A consumer names its `team` (not an account); `PlatformStack`
+> resolves the team's account for the deploy `stage` (`PAVED_CDK_STAGE`, default `dev`) via
+> `AccountRegistry.account_for(team, stage)`, then the resolver above runs by that account id.
+> So the same consumer code lands in a different account/VPC purely by team + stage. The full
+> per-account / per-team / per-consumer model is in [`configuration.md`](configuration.md)
+> (ADR 0012).
 
 ---
 
@@ -319,9 +327,10 @@ flowchart TB
 
 **Mechanics:**
 - **dev** gets every `main` push; **preprod & prod only a release tag** `vX.Y.Z` (prod with
-  Required Reviewers). A **PR** gets a live, ephemeral `pr-<n>-<slug>` preview in **dev**
-  (same-repo only), destroyed when the PR closes - the prefix comes from `STACK_PREFIX`, which
-  `PlatformStack` applies transparently.
+  Required Reviewers). A **PR** gets a live, ephemeral preview in **dev** (same-repo only),
+  destroyed when the PR closes. Stack names follow `$stage-$stackPrefix-$project` (e.g.
+  `dev-pr123-scoring`); the optional `STACK_PREFIX` (e.g. `pr123`) is set by the pipeline for
+  previews and applied by `PlatformStack` transparently.
 - **Deploy auth is platform-owned:** per-stage account ids are GitHub **variables**
   (not secrets), the OIDC role ARN is derived by convention; the same ids feed the registry so
   synth resolves the baseline. The thin caller passes **no secrets and no AWS config**.
@@ -509,11 +518,12 @@ C4Component
 
 ## Known sharp edges (carry these honestly into the presentation)
 
-- **Default-VPC PoC baseline** - the example registry is verified offline (13 tests green)
-  and was deployed end-to-end into a `dev` account (private API + KMS bucket + boundary +
-  tags confirmed on real infra). The baseline is wired to the account's **default VPC**;
-  a real deployment uses dedicated private subnets. Account ids are read from environment
-  variables (`PAVED_CDK_{DEV,PREPROD,PROD}_ACCOUNT_ID`), with placeholders as fallback.
+- **Default-VPC PoC baseline** - the example registry is verified offline (22 tests green)
+  and was deployed end-to-end into **two real accounts**: `dev-consumer1` into the dev account
+  (private API + KMS bucket + in-VPC Lambda + boundary + tags) and `dev-consumer2` into the
+  preprod account (SecureLambda; preprod has no execute-api endpoint). The baseline is wired
+  to the account's **default VPC**; a real deployment uses dedicated private subnets. Account
+  ids are read from `PAVED_CDK_<TEAM>_<STAGE>_ACCOUNT_ID`, with placeholders as fallback.
 - **The registry must stay in sync with reality** - baseline values now live in code, not
   live in SSM. If the LZ rotates a subnet/KMS, a PR must update the registry, and consumers
   pick it up only via `copier update` (pull, not automatic). Mitigation: generate the
