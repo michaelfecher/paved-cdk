@@ -13,7 +13,7 @@ import os
 
 import yaml
 
-from ..service import ApiRoute, FunctionSpec, NotebookSpec, ServiceSpec
+from ..service import ApiRoute, DataApiSpec, FunctionSpec, NotebookSpec, ServiceSpec
 
 log = logging.getLogger(__name__)
 
@@ -62,6 +62,16 @@ def _discover_notebooks() -> list[NotebookSpec]:
     return notebooks
 
 
+def _data_api_from(entry: object) -> DataApiSpec:
+    """Map one ``data_apis:`` entry to a :class:`DataApiSpec`.
+
+    Accepts a bare name (``- scoring-data``) or a mapping (``- {name: scoring-data}``).
+    """
+    if isinstance(entry, dict):
+        return DataApiSpec(name=entry["name"])
+    return DataApiSpec(name=str(entry))
+
+
 def load(path: str = "service.yaml") -> ServiceSpec:
     """Read a manifest (relative to cwd) and return a :class:`ServiceSpec`.
 
@@ -73,19 +83,26 @@ def load(path: str = "service.yaml") -> ServiceSpec:
 
     functions = [_function_from(entry) for entry in data.get("functions", [])]
     notebooks = _discover_notebooks()
+    data_apis = [_data_api_from(entry) for entry in data.get("data_apis", [])]
 
     log.info(
-        "loaded manifest %s: service_id=%s functions=%d notebooks=%d",
+        "loaded manifest %s: service_id=%s functions=%d notebooks=%d data_apis=%d",
         path,
         data.get("service_id"),
         len(functions),
         len(notebooks),
+        len(data_apis),
     )
-    return ServiceSpec(functions=functions, notebooks=notebooks)
+    return ServiceSpec(functions=functions, notebooks=notebooks, data_apis=data_apis)
 
 
 def read_meta(path: str = "service.yaml") -> dict:
-    """Return the top-level manifest metadata (``service_id``, ``owner``)."""
+    """Return the top-level manifest metadata (identity + governance tags)."""
     with open(path, encoding="utf-8") as fh:
         data = yaml.safe_load(fh) or {}
-    return {"service_id": data.get("service_id"), "owner": data.get("owner")}
+    return {
+        "service_id": data.get("service_id"),
+        "owner": data.get("owner"),
+        "team": data.get("team"),
+        "cost_center": data.get("cost_center"),
+    }

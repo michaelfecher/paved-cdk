@@ -25,12 +25,14 @@ def _cdk_safe_id(value: str | None, default: str) -> str:
     return cleaned or default
 
 
-def _tags(owner: str | None) -> dict[str, str]:
-    """Governance tags: manifest owner (or env) + team/cost-center from env."""
+def _tags(meta: dict) -> dict[str, str]:
+    """Governance tags from the manifest (owner/team/cost_center), env as fallback."""
     return {
-        "Owner": owner or os.environ.get("PAVED_CDK_OWNER", "ds@example.com"),
-        "Team": os.environ.get("PAVED_CDK_TEAM", "ds"),
-        "CostCenter": os.environ.get("PAVED_CDK_COST_CENTER", "4711"),
+        "Owner": meta.get("owner") or os.environ.get("PAVED_CDK_OWNER", "ds@example.com"),
+        "Team": meta.get("team") or os.environ.get("PAVED_CDK_TEAM", "ds"),
+        "CostCenter": (
+            meta.get("cost_center") or os.environ.get("PAVED_CDK_COST_CENTER", "4711")
+        ),
     }
 
 
@@ -41,7 +43,7 @@ def main() -> None:
     meta = manifest.read_meta("service.yaml")
 
     stack_id = _cdk_safe_id(meta.get("service_id"), "payments")
-    tags = _tags(meta.get("owner"))
+    tags = _tags(meta)
     log.info("synth: stack_id=%s tags=%s", stack_id, tags)
 
     app = cdk.App()

@@ -1,0 +1,11 @@
+"""Handler for the `predict` function in service.yaml.
+
+The module and function names must match the manifest entry (default handler is
+``<name>.<name>``, i.e. ``predict.predict``). This is your own code; the platform
+wraps it in a governed, in-VPC, KMS-encrypted Lambda.
+"""
+
+
+def predict(event, context):
+    """Your inference / processing code goes here."""
+    return {"statusCode": 200, "body": "ok"}

@@ -17,7 +17,7 @@ validate: install  ## Offline synth via Python only - no Node, no AWS creds
 	CDK_DEFAULT_ACCOUNT=$${PAVED_CDK_DEV_ACCOUNT_ID:-111111111111} \
 	CDK_DEFAULT_REGION=$${PAVED_CDK_REGION:-eu-west-1} \
 	CDK_OUTDIR=cdk.out \
-	uv run python app.py
+	uv run paved-cdk-synth
 	@echo "synthesized to cdk.out/ (no Node, no AWS)"
 
 smoke: validate  ## Quick smoke check - confirm a CloudFormation template was produced

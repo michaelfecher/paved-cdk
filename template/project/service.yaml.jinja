@@ -1,0 +1,22 @@
+# {{ project_name }} - declarative service manifest.
+#
+# This file IS the service definition - no Python app, no CDK objects. `paved-cdk-synth`
+# reads it and materializes governed resources:
+#   functions  -> in-VPC, KMS-encrypted Lambdas (code from handlers/<name>.py)
+#   data_apis  -> encrypted S3 bucket + private API Gateway
+# The platform resolves VPC, subnets, KMS, the IAM permissions boundary, log
+# retention and tags from the target account. You never declare any of that.
+
+service_id: {{ project_slug }}
+owner: {{ owner_email }}
+team: {{ team }}
+cost_center: "{{ cost_center }}"
+
+data_apis:
+  - {{ project_slug }}-data        # S3 bucket + private API Gateway
+
+functions:
+  - name: predict                  # handlers/predict.py -> def predict(event, context)
+    memory: 256
+    # schedule: "rate(1 day)"      # uncomment for an EventBridge schedule
+    # api: { method: POST, path: /predict }   # uncomment to put it behind the private API
