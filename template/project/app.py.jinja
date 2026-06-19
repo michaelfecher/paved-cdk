@@ -1,26 +1,21 @@
-"""{{ project_name }} - generated from the Paved CDK template.
+"""{{ project_name }} - generated from the Paved CDK template (SDK variant).
 
-You only declare WHAT you want. The platform resolves VPC, subnets, KMS, the IAM
-permissions boundary, tags and governance automatically from the target account.
-Add more platform constructs below; do not add vpc/env/kms arguments.
+You rarely touch this file. Declare your service in ``handlers/*.py`` using the
+SDK decorators (``@function`` / ``@scheduled`` / ``@api``) and storage via
+``data_api(...)``. ``synth()`` imports the handlers, turns the registrations into
+governed resources (in-VPC KMS Lambdas, private API, EventBridge) and synthesizes.
+
+The platform resolves VPC, subnets, KMS, the IAM permissions boundary, log
+retention and governance tags from the target account - you never pass them.
 """
 
-import aws_cdk as cdk
+from paved_cdk.sdk import synth
 
-from paved_cdk import PlatformStack, SecureDataApi
-
-app = cdk.App()
-
-stack = PlatformStack(
-    app,
-    "{{ project_slug }}",
+synth(
+    service="{{ project_slug }}",
     tags={
         "Owner": "{{ owner_email }}",
         "Team": "{{ team }}",
         "CostCenter": "{{ cost_center }}",
     },
 )
-
-SecureDataApi(stack, "DataApi")
-
-app.synth()

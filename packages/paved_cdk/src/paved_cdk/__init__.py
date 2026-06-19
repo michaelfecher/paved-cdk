@@ -6,7 +6,14 @@ from .config import PlatformConfig, PlatformConfigError
 from .constructs import SecureDataApi, SecureDataApiProps
 from .environment import PlatformEnvironment
 from .registry import DEFAULT_REGISTRY, AccountRegistry
-from .service import ApiRoute, FunctionSpec, NotebookSpec, ServiceSpec, build_service
+from .service import (
+    ApiRoute,
+    DataApiSpec,
+    FunctionSpec,
+    NotebookSpec,
+    ServiceSpec,
+    build_service,
+)
 from .stacks import PlatformStack
 
 __version__ = "0.1.0"
@@ -28,5 +35,6 @@ __all__ = [
     "FunctionSpec",
     "NotebookSpec",
     "ApiRoute",
+    "DataApiSpec",
     "build_service",
 ]

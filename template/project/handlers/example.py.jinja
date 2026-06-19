@@ -1,0 +1,17 @@
+"""Example handler - replace with your own.
+
+Each decorated function becomes a governed, in-VPC, KMS-encrypted Lambda. The
+``data_api`` call adds an encrypted S3 bucket fronted by a private API Gateway.
+Nothing here references VPC/KMS/IAM - the platform wires that from the account.
+"""
+
+from paved_cdk.sdk import data_api, function
+
+# An encrypted S3 data bucket + private API Gateway.
+data_api("{{ project_slug }}-data")
+
+
+@function()
+def predict(event, context):
+    """Your inference / processing code goes here."""
+    return {"statusCode": 200, "body": "ok"}

@@ -7,7 +7,7 @@ same :func:`~paved_cdk.service.build_service`, so intent maps to identical
 governed resources.
 """
 
-from .decorators import api, function, scheduled
+from .decorators import api, data_api, function, scheduled
 from .synth import synth
 
-__all__ = ["synth", "function", "scheduled", "api"]
+__all__ = ["synth", "function", "scheduled", "api", "data_api"]

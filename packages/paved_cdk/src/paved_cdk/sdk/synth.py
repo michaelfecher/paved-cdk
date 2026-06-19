@@ -28,12 +28,13 @@ import aws_cdk as cdk
 from .. import PlatformStack
 from ..service import (
     ApiRoute,
+    DataApiSpec,
     FunctionSpec,
     NotebookSpec,
     ServiceSpec,
     build_service,
 )
-from .decorators import REGISTRY, Registration
+from .decorators import DATA_APIS, REGISTRY, Registration
 
 logger = logging.getLogger(__name__)
 
@@ -112,19 +113,32 @@ def _discover_notebooks() -> list[NotebookSpec]:
 def _build_spec() -> ServiceSpec:
     functions = [_function_spec(reg) for reg in REGISTRY]
     notebooks = _discover_notebooks()
+    data_apis = [DataApiSpec(name=name) for name in DATA_APIS]
     logger.info(
-        "SDK spec: %d function(s), %d notebook(s).", len(functions), len(notebooks)
+        "SDK spec: %d function(s), %d notebook(s), %d data api(s).",
+        len(functions),
+        len(notebooks),
+        len(data_apis),
     )
-    return ServiceSpec(functions=functions, notebooks=notebooks)
+    return ServiceSpec(functions=functions, notebooks=notebooks, data_apis=data_apis)
 
 
-def synth() -> cdk.App:
-    """Build and synthesize the SDK-defined service. Returns the App (testable)."""
+def synth(
+    *,
+    service: str | None = None,
+    tags: dict[str, str] | None = None,
+) -> cdk.App:
+    """Build and synthesize the SDK-defined service. Returns the App (testable).
+
+    ``service`` (stack id) and ``tags`` default to the ``PAVED_CDK_*`` env vars, so
+    the scaffolded ``app.py`` can pass the project's identity explicitly while CI can
+    still override via the environment.
+    """
     app = cdk.App()
     stack = PlatformStack(
         app,
-        os.environ.get("PAVED_CDK_SERVICE", "payments"),
-        tags=_tags(),
+        service or os.environ.get("PAVED_CDK_SERVICE", "payments"),
+        tags=tags or _tags(),
     )
 
     _import_handlers()

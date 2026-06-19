@@ -31,6 +31,12 @@ from typing import Any
 #: so decoration is a pure side effect of importing the handler modules.
 REGISTRY: list[Registration] = []
 
+#: Names of declared data APIs (S3 bucket + private API Gateway). A consumer calls
+#: ``data_api("scoring-data")`` at module level; ``synth`` maps each onto a
+#: :class:`~paved_cdk.service.DataApiSpec`. Same module-level-side-effect model as the
+#: handler decorators, so a plain ``import`` of the handlers package records them.
+DATA_APIS: list[str] = []
+
 
 @dataclass
 class Registration:
@@ -145,4 +151,14 @@ class _Api:
 api = _Api()
 
 
-__all__ = ["REGISTRY", "Registration", "function", "scheduled", "api"]
+def data_api(name: str = "data-api") -> None:
+    """Declare an encrypted S3 data bucket fronted by a private API Gateway.
+
+    Not a decorator - a plain module-level call (``data_api("scoring-data")``) since
+    storage is not a handler. Records the name for ``synth`` to map onto a
+    :class:`~paved_cdk.service.DataApiSpec`.
+    """
+    DATA_APIS.append(name)
+
+
+__all__ = ["REGISTRY", "DATA_APIS", "Registration", "function", "scheduled", "api", "data_api"]

@@ -19,6 +19,7 @@ from aws_cdk import aws_lambda as _lambda
 from constructs import Construct
 
 from .compute.secure_lambda import SecureLambda, SecureLambdaProps
+from .constructs.secure_data_api import SecureDataApi, SecureDataApiProps
 from .environment import PlatformEnvironment
 
 
@@ -26,6 +27,14 @@ from .environment import PlatformEnvironment
 class ApiRoute:
     method: str  # GET | POST | PUT | DELETE
     path: str  # e.g. "/charge"
+
+
+@dataclass
+class DataApiSpec:
+    """An encrypted S3 data bucket fronted by a private API Gateway. Maps onto the
+    catalog :class:`~paved_cdk.SecureDataApi` so every front end gets the same brick."""
+
+    name: str = "data-api"
 
 
 @dataclass
@@ -55,6 +64,7 @@ class NotebookSpec:
 class ServiceSpec:
     functions: list[FunctionSpec] = field(default_factory=list)
     notebooks: list[NotebookSpec] = field(default_factory=list)
+    data_apis: list[DataApiSpec] = field(default_factory=list)
 
 
 def _cid(name: str) -> str:
@@ -121,6 +131,13 @@ def build_service(scope: Construct, spec: ServiceSpec) -> None:
             targets=[targets.LambdaFunction(runner.function)],
         )
 
+    for data in spec.data_apis:
+        SecureDataApi(
+            scope,
+            _cid(data.name) + "Data",
+            props=SecureDataApiProps(api_name=data.name),
+        )
+
 
 def _private_api(scope: Construct, cfg) -> apigateway.RestApi:
     """A PRIVATE REST API reachable only via the account's execute-api VPC endpoint."""
@@ -155,4 +172,11 @@ def _private_api(scope: Construct, cfg) -> apigateway.RestApi:
     return api
 
 
-__all__ = ["ApiRoute", "FunctionSpec", "NotebookSpec", "ServiceSpec", "build_service"]
+__all__ = [
+    "ApiRoute",
+    "DataApiSpec",
+    "FunctionSpec",
+    "NotebookSpec",
+    "ServiceSpec",
+    "build_service",
+]
