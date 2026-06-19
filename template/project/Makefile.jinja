@@ -12,10 +12,10 @@ install:  ## Install deps (pulls the platform library at the pinned tag) - no No
 	uv sync
 
 validate: install  ## Offline synth via Python only - no Node, no AWS creds
-	# Synthesizes against the dev baseline (placeholder account id if env unset), runs
-	# the governance aspects, writes cdk.out/. No CDK CLI (Node) and no AWS login needed.
-	CDK_DEFAULT_ACCOUNT=$${PAVED_CDK_DEV_ACCOUNT_ID:-111111111111} \
-	CDK_DEFAULT_REGION=$${PAVED_CDK_REGION:-eu-west-1} \
+	# Synthesizes against your team's baseline for the stage (default dev; account id
+	# is the placeholder if its env var is unset), runs the governance aspects, writes
+	# cdk.out/. No CDK CLI (Node) and no AWS login needed.
+	PAVED_CDK_STAGE=$${PAVED_CDK_STAGE:-dev} \
 	CDK_OUTDIR=cdk.out \
 	uv run python app.py
 	@echo "synthesized to cdk.out/ (no Node, no AWS)"

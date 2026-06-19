@@ -29,7 +29,7 @@ The scaffolded project already synths: the starter `handlers/example.py` has one
 ```bash
 uv run copier copy --vcs-ref HEAD "$PLATFORM" "$DEMO/consumer-a-scoring" \
   --data project_name="Scoring Service" --data project_slug="scoring-service" \
-  --data owner_email="alice@example.com" --data team="ds-risk" \
+  --data owner_email="alice@example.com" --data team="ds" \
   --data cost_center="4711" --defaults --trust
 ```
 
@@ -53,7 +53,7 @@ def predict(event, context):
 
 ```bash
 cd "$DEMO/consumer-a-scoring"
-CDK_DEFAULT_ACCOUNT=111111111111 CDK_DEFAULT_REGION=eu-west-1 CDK_OUTDIR=cdk.out \
+PAVED_CDK_STAGE=dev CDK_OUTDIR=cdk.out \
   uv run --project "$PLATFORM" python app.py
 
 python3 -c "import json,glob;from collections import Counter; \
@@ -71,7 +71,7 @@ unreleased SDK changes synth without a tag. In a real consumer repo you run `mak
 ```bash
 uv run copier copy --vcs-ref HEAD "$PLATFORM" "$DEMO/consumer-b-ingest" \
   --data project_name="Ingest Service" --data project_slug="ingest-service" \
-  --data owner_email="bob@example.com" --data team="ds-data" \
+  --data owner_email="bob@example.com" --data team="marketing" \
   --data cost_center="4712" --defaults --trust
 ```
 
@@ -93,7 +93,7 @@ PY
 
 ```bash
 cd "$DEMO/consumer-b-ingest"
-CDK_DEFAULT_ACCOUNT=111111111111 CDK_DEFAULT_REGION=eu-west-1 CDK_OUTDIR=cdk.out \
+PAVED_CDK_STAGE=dev CDK_OUTDIR=cdk.out \
   uv run --project "$PLATFORM" python app.py
 # -> {'Bucket': 1, 'RestApi': 1, 'Function': 2}
 ```

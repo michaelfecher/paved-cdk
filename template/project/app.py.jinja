@@ -13,9 +13,9 @@ from paved_cdk.sdk import synth
 
 synth(
     service="{{ project_slug }}",
+    team="{{ team }}",  # selects the account baseline (VPC/KMS/...) per stage
     tags={
         "Owner": "{{ owner_email }}",
-        "Team": "{{ team }}",
         "CostCenter": "{{ cost_center }}",
     },
 )

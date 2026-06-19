@@ -24,7 +24,11 @@ owner_email:
 
 team:
   type: str
-  help: Team name (becomes the Team tag)
+  help: >-
+    Team name. Must match a team onboarded in the platform registry
+    (registry.py) - it selects your three AWS accounts (dev/preprod/prod) and
+    their VPC/KMS baseline. Ask the platform team if unsure.
+  default: ds
 
 cost_center:
   type: str

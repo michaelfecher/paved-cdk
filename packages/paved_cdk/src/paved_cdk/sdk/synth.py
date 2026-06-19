@@ -126,18 +126,21 @@ def _build_spec() -> ServiceSpec:
 def synth(
     *,
     service: str | None = None,
+    team: str | None = None,
     tags: dict[str, str] | None = None,
 ) -> cdk.App:
     """Build and synthesize the SDK-defined service. Returns the App (testable).
 
-    ``service`` (stack id) and ``tags`` default to the ``PAVED_CDK_*`` env vars, so
-    the scaffolded ``app.py`` can pass the project's identity explicitly while CI can
-    still override via the environment.
+    ``service`` (stack id), ``team`` and ``tags`` default to the ``PAVED_CDK_*`` env
+    vars, so the scaffolded ``app.py`` passes the project identity explicitly while CI
+    can override via the environment. ``team`` selects the account baseline from the
+    registry (see PlatformStack); when unset, resolution falls back to CDK_DEFAULT_*.
     """
     app = cdk.App()
     stack = PlatformStack(
         app,
         service or os.environ.get("PAVED_CDK_SERVICE", "payments"),
+        team=team or os.environ.get("PAVED_CDK_TEAM"),
         tags=tags or _tags(),
     )
 

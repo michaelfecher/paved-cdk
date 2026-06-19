@@ -44,7 +44,8 @@ def score(event, context):
 ```python
 # app.py  (the whole file)
 from paved_cdk.sdk import synth
-synth()
+synth(service="scoring-service", team="ds",
+      tags={"Owner": "alice@example.com", "CostCenter": "4711"})
 ```
 
 ### Declarative (`feat/declarative`)
@@ -53,6 +54,8 @@ synth()
 # service.yaml
 service_id: scoring-service
 owner: alice@example.com
+team: ds                          # selects the account baseline (VPC/KMS/...)
+cost_center: "4711"
 data_apis:
   - name: scoring-data            # S3 bucket + private API
 functions:
@@ -62,6 +65,11 @@ functions:
 // cdk.json
 { "app": "paved-cdk-synth" }
 ```
+
+In all three the consumer names its `team` and nothing else about infrastructure: the
+team selects the three AWS accounts and their VPC/KMS baseline, resolved from the static
+in-code registry. See [`docs/configuration.md`](../configuration.md) for the per-account /
+per-team / per-consumer config model and the PR-based maintenance (no DynamoDB).
 
 ## Convergence
 
