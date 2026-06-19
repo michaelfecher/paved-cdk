@@ -18,13 +18,6 @@ from . import manifest
 log = logging.getLogger(__name__)
 
 
-def _cdk_safe_id(value: str | None, default: str) -> str:
-    """A CDK/CloudFormation-safe construct id: alnum only, never empty."""
-    raw = value or default
-    cleaned = "".join(ch for ch in raw.title() if ch.isalnum())
-    return cleaned or default
-
-
 def _tags(meta: dict) -> dict[str, str]:
     """Governance tags from the manifest (owner/team/cost_center), env as fallback."""
     return {
@@ -42,12 +35,14 @@ def main() -> None:
     spec = manifest.load("service.yaml")
     meta = manifest.read_meta("service.yaml")
 
-    stack_id = _cdk_safe_id(meta.get("service_id"), "payments")
+    project = meta.get("service_id") or "payments"
     tags = _tags(meta)
-    log.info("synth: stack_id=%s tags=%s", stack_id, tags)
+    log.info("synth: project=%s team=%s tags=%s", project, meta.get("team"), tags)
 
     app = cdk.App()
-    stack = PlatformStack(app, stack_id, tags=tags)
+    # team drives the account baseline (PlatformStack); the stack is named
+    # $stage-$stackPrefix-$project from there.
+    stack = PlatformStack(app, project, team=meta.get("team"), tags=tags)
     build_service(stack, spec)
     app.synth()
 
