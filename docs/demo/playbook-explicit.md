@@ -27,11 +27,14 @@ mkdir -p "$DEMO"
 ## 1. Consumer A - scaffold
 
 ```bash
-uv run copier copy "$PLATFORM" "$DEMO/consumer-a-scoring" \
+uv run copier copy --vcs-ref HEAD "$PLATFORM" "$DEMO/consumer-a-scoring" \
   --data project_name="Scoring Service" --data project_slug="scoring-service" \
-  --data owner_email="alice@example.com" --data team="ds-risk" \
+  --data owner_email="alice@example.com" --data team="ds" \
   --data cost_center="4711" --defaults --trust
 ```
+
+`--vcs-ref HEAD` uses the branch tip (the team-aware template is not tagged yet).
+`team` must be a team onboarded in the registry (`ds` or, illustratively, `marketing`).
 
 ## 2. Consumer A - add the workload
 
@@ -59,7 +62,8 @@ from paved_cdk import (
 app = cdk.App()
 stack = PlatformStack(
     app, "scoring-service",
-    tags={"Owner": "alice@example.com", "Team": "ds-risk", "CostCenter": "4711"},
+    team="ds",                                   # selects the account baseline (VPC/KMS/...)
+    tags={"Owner": "alice@example.com", "CostCenter": "4711"},
 )
 SecureDataApi(stack, "Data", props=SecureDataApiProps(api_name="scoring-data"))
 SecureLambda(stack, "Score", props=SecureLambdaProps(code=_lambda.Code.from_asset("src/score")))
@@ -70,10 +74,13 @@ app.synth()
 
 ```bash
 cd "$DEMO/consumer-a-scoring"
-CDK_DEFAULT_ACCOUNT=111111111111 CDK_DEFAULT_REGION=eu-west-1 CDK_OUTDIR=cdk.out \
+PAVED_CDK_STAGE=dev CDK_OUTDIR=cdk.out \
   uv run --project "$PLATFORM" python app.py
 ls cdk.out/*.template.json && echo "SYNTH OK"
 ```
+
+No account id needed: `team="ds"` + `PAVED_CDK_STAGE=dev` resolves the ds-dev account
+and its VPC from the registry.
 
 `--project "$PLATFORM"` runs against the local platform source (the working tree),
 so you synth unreleased changes without a published tag. In the real consumer repo you
@@ -91,10 +98,13 @@ print({k:c[k] for k in ('AWS::S3::Bucket','AWS::ApiGateway::RestApi','AWS::Lambd
 
 ## 4. Consumer B - scaffold, add 2 Lambdas, synth
 
+Put consumer B in a **different team** (`marketing`) to show the per-team baseline: the
+same code resolves a different VPC.
+
 ```bash
-uv run copier copy "$PLATFORM" "$DEMO/consumer-b-ingest" \
+uv run copier copy --vcs-ref HEAD "$PLATFORM" "$DEMO/consumer-b-ingest" \
   --data project_name="Ingest Service" --data project_slug="ingest-service" \
-  --data owner_email="bob@example.com" --data team="ds-data" \
+  --data owner_email="bob@example.com" --data team="marketing" \
   --data cost_center="4712" --defaults --trust
 
 mkdir -p "$DEMO/consumer-b-ingest/src/ingest" "$DEMO/consumer-b-ingest/src/transform"
@@ -116,7 +126,8 @@ from paved_cdk import (
 app = cdk.App()
 stack = PlatformStack(
     app, "ingest-service",
-    tags={"Owner": "bob@example.com", "Team": "ds-data", "CostCenter": "4712"},
+    team="marketing",                            # different team -> different VPC/KMS
+    tags={"Owner": "bob@example.com", "CostCenter": "4712"},
 )
 SecureDataApi(stack, "Data", props=SecureDataApiProps(api_name="ingest-data"))
 SecureLambda(stack, "Ingest", props=SecureLambdaProps(code=_lambda.Code.from_asset("src/ingest")))
@@ -127,9 +138,11 @@ app.synth()
 
 ```bash
 cd "$DEMO/consumer-b-ingest"
-CDK_DEFAULT_ACCOUNT=111111111111 CDK_DEFAULT_REGION=eu-west-1 CDK_OUTDIR=cdk.out \
+PAVED_CDK_STAGE=dev CDK_OUTDIR=cdk.out \
   uv run --project "$PLATFORM" python app.py
 # shape: 1 S3 bucket, 1 RestApi, 2 Lambda functions
+# grep the template: it resolves marketing's VPC (vpc-0a11...), not ds's (vpc-0c86...)
+grep -o 'vpc-[0-9a-f]*' cdk.out/ingest-service.template.json | sort -u
 ```
 
 ## What this proves
