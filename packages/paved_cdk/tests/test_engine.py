@@ -40,16 +40,16 @@ def test_data_apis_accept_mapping_form(tmp_path, monkeypatch):
 
 def test_main_wires_team_into_account_and_stack_name(tmp_path, monkeypatch):
     """Regression: the engine must pass the manifest's team to PlatformStack, so the
-    stack resolves the team's account (not CDK_DEFAULT_*) and is named $stage-$project."""
+    stack resolves the team's account (not CDK_DEFAULT_*) and is named $stage-$project.
+    Uses a functions-less manifest to avoid Code.from_asset staging (whose relative path
+    resolves against the jsii process cwd, not chdir)."""
     import glob
     import json
 
     (tmp_path / "service.yaml").write_text(
         "service_id: demo\nowner: a@x.io\nteam: ds\ncost_center: \"1\"\n"
-        "data_apis:\n  - demo-data\nfunctions:\n  - name: predict\n"
+        "data_apis:\n  - demo-data\n"
     )
-    (tmp_path / "handlers").mkdir()
-    (tmp_path / "handlers" / "predict.py").write_text("def predict(e, c):\n    return {}\n")
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv("PAVED_CDK_STAGE", "dev")
     monkeypatch.setenv("CDK_OUTDIR", str(tmp_path / "cdk.out"))
