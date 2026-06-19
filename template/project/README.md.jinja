@@ -1,12 +1,30 @@
 # {{ project_name }}
 
-Generated from the Paved CDK template.
+Generated from the Paved CDK template (SDK variant).
+
+## Defining your service
+
+You write plain decorated functions in `handlers/*.py`; `app.py` only calls `synth()`.
+
+```python
+# handlers/example.py
+from paved_cdk.sdk import data_api, function
+
+data_api("{{ project_slug }}-data")   # S3 bucket + private API Gateway
+
+@function()                            # in-VPC, KMS-encrypted Lambda
+def predict(event, context):
+    return {"statusCode": 200}
+```
+
+Add more functions (`@function`, `@scheduled("rate(1 day)")`, `@api.post("/x")`) as
+new modules under `handlers/`. The platform discovers them at synth time.
 
 ## First time
 
 ```bash
 uv sync          # pulls the platform library straight from GitHub (pinned tag)
-uv run cdk synth # builds the template - deterministic, no AWS login needed
+uv run python app.py   # synth - deterministic, no AWS login, no Node
 ```
 
 The platform library is declared as a git dependency in `pyproject.toml` (no extra
@@ -38,4 +56,4 @@ copier update     # re-renders against the latest template, bumps the platform t
 
 VPC, subnets, KMS encryption, IAM permissions boundary, log retention and
 governance tags are resolved automatically from whichever of your three accounts
-the pipeline is deploying into. Just add platform constructs in `app.py`.
+the pipeline is deploying into. Just add decorated handlers under `handlers/`.

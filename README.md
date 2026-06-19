@@ -8,12 +8,14 @@ no VPC, env, KMS, IAM or tagging decisions.
 See [`CONTEXT.md`](CONTEXT.md) for the domain language and [`docs/adr/`](docs/adr/)
 for decisions.
 
-> **Scope - minimal v1.** The committed core is the construct library
-> (kernel + `SecureLambda` + `SecureDataApi`) plus the Copier template - i.e. what a
-> consumer actually deploys. The reusable **pipeline**, the **SDK/declarative variants**,
-> the **service-orchestration layer**, the **prototypes** and the **onboarding** automation
-> are **parked** in a local, git-ignored `_parked/` folder for a later phase. Some docs and
-> diagrams below still describe that fuller design.
+> **This branch = the SDK variant.** Consumers declare their service as plain decorated
+> functions in `handlers/*.py` (`@function` / `@scheduled` / `@api`) plus `data_api(...)`
+> for storage; `app.py` only calls `synth()`. It converges on the shared
+> `build_service`, so it yields the same governed resources as the other variants.
+> See [`docs/demo/variants.md`](docs/demo/variants.md) for the side-by-side and
+> [`docs/demo/playbook-sdk.md`](docs/demo/playbook-sdk.md) for a step-by-step. The
+> reusable **pipeline**, **prototypes** and **onboarding** automation are **parked** in a
+> local, git-ignored `_parked/` folder. Some docs and diagrams still describe the fuller design.
 
 ## Layout
 
