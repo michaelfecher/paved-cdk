@@ -215,7 +215,7 @@ LANE_C = ("rounded=0;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#1F6FE
 
 repos = Page("Repos & Workflows", "repos")
 # --- Lane A: Platform repo (source of truth) ---
-repos.node("laneA", "Platform repo - michaelfecher/paved-cdk  (source of truth)",
+repos.node("laneA", "Platform repo - your-org/paved-cdk  (source of truth)",
            LANE, 40, 40, 1180, 230)
 repos.node("lib", "Library (constructs + governance + resolver)", BOX, 70, 80, 250, 30)
 repos.node("reg", "AccountRegistry (static config)", BOX_GREEN, 340, 80, 230, 30)

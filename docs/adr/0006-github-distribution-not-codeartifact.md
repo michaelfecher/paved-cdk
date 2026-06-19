@@ -17,7 +17,7 @@ pinned to a git tag**, via uv's git source:
 
 ```toml
 [tool.uv.sources]
-paved-cdk = { git = "https://github.com/michaelfecher/paved-cdk.git",
+paved-cdk = { git = "https://github.com/your-org/paved-cdk.git",
                        tag = "v0.1.0", subdirectory = "packages/paved_cdk" }
 ```
 
