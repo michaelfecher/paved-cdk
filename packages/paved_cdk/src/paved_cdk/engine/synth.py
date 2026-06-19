@@ -29,9 +29,12 @@ def _tags(meta: dict) -> dict[str, str]:
     }
 
 
-def main() -> None:
-    logging.basicConfig(level=os.environ.get("PAVED_CDK_LOG_LEVEL", "INFO"))
+def _build(app: cdk.App) -> PlatformStack:
+    """Build the service stack from ``service.yaml`` onto ``app`` (no ``synth()``).
 
+    Split out from :func:`main` so tests can inspect the resulting stack (account,
+    name) without driving a full cloud-assembly write.
+    """
     spec = manifest.load("service.yaml")
     meta = manifest.read_meta("service.yaml")
 
@@ -39,11 +42,17 @@ def main() -> None:
     tags = _tags(meta)
     log.info("synth: project=%s team=%s tags=%s", project, meta.get("team"), tags)
 
-    app = cdk.App()
     # team drives the account baseline (PlatformStack); the stack is named
     # $stage-$stackPrefix-$project from there.
     stack = PlatformStack(app, project, team=meta.get("team"), tags=tags)
     build_service(stack, spec)
+    return stack
+
+
+def main() -> None:
+    logging.basicConfig(level=os.environ.get("PAVED_CDK_LOG_LEVEL", "INFO"))
+    app = cdk.App()
+    _build(app)
     app.synth()
 
 
