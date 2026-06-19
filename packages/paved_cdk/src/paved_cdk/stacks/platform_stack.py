@@ -39,12 +39,12 @@ class PlatformStack(cdk.Stack):
     ) -> None:
         env = kwargs.pop("env", None)
         provided_tags = dict(tags or {})
+        stage = stage or os.environ.get("PAVED_CDK_STAGE", "dev")
 
         # Team-driven resolution: name the team, the platform picks the account for
         # the deploy stage from the registry. The team becomes the authoritative
         # Team tag.
         if env is None and team is not None:
-            stage = stage or os.environ.get("PAVED_CDK_STAGE", "dev")
             account = DEFAULT_REGISTRY.account_for(team, stage)
             env = cdk.Environment(account=account.account_id, region=account.region)
             existing = provided_tags.get("Team")
@@ -62,11 +62,13 @@ class PlatformStack(cdk.Stack):
                 region=os.environ.get("CDK_DEFAULT_REGION"),
             )
 
-        # Pipeline-supplied prefix for ephemeral PR-preview stacks; empty otherwise.
-        # Applied to the stack id (-> CloudFormation stack name) so previews don't
-        # collide with the persistent dev/preprod/prod stacks.
+        # Stack name: ``$stage-$stackPrefix-$project``. STACK_PREFIX is optional (e.g.
+        # ``pr123`` for PR-preview deploys); empty parts are dropped so there is no
+        # double dash. The stage prefix keeps dev/test/prod (and PR previews) from
+        # colliding in the same account.
         prefix = os.environ.get("STACK_PREFIX", "")
-        super().__init__(scope, f"{prefix}{id}" if prefix else id, env=env, **kwargs)
+        stack_name = "-".join(part for part in (stage, prefix, id) if part)
+        super().__init__(scope, stack_name, env=env, **kwargs)
 
         # Governance tags supplied by the caller (the Copier template injects
         # Owner/Team/CostCenter from the scaffold answers).
